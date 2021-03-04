@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Hang Time</string>
+    <string name = "userNameOrEmail">Username or Email</string>
+    <string name="password">Password</string>
+    <string name="logInButton">Log In</string>
+    <string name="newUserButton">New User</string>
+</resources>
