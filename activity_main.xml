@@ -9,11 +9,17 @@
 
     >
 
-
     <TextView
         android:layout_width="300dp"
         android:layout_height="30dp"
-        android:text="@string/userNameOrEmail"/>
+        android:text="@string/invalidLogin"
+        android:id="@+id/invalidLogin"
+        android:visibility="invisible"
+        android:textColor="@color/design_default_color_error"/>
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="30dp"
+        android:text="@string/userNameOrEmail" />
     <EditText
         android:layout_width="300dp"
         android:layout_height="40dp"
@@ -44,7 +50,7 @@
         android:layout_width="120dp"
         android:layout_height="60dp"
         android:text="New User"
-        android:id="@string/newUserButton"
+        android:id="@+id/newUserButton"
         />
 
 
