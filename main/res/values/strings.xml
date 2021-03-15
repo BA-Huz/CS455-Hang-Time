@@ -1,0 +1,20 @@
+<resources>
+    <!-- These strings are used with the activity mains -->
+    <string name="app_name">Hang Time</string>
+    <string name="Email">Email</string>
+    <string name="password">Password</string>
+    <string name="logInButton">Log In</string>
+    <string name="invalidLogin">Invalid Login</string>
+    <string name="title_activity_sign_up">SignUp</string>
+    <string name="newUser">New User</string>
+
+    <!-- These strings are used with the activity sign ups -->
+    <string name="signUpName">Enter the name you want to use</string>
+    <string name="signUpEmail">Enter your email</string>
+    <string name="signUpPassword">Enter a password to use</string>
+    <string name="signUpRePassword">Reenter your password</string>
+    <string name="signUp">Sign Up</string>
+    <string name="allFieldsError">All fields are required</string>
+    <string name="infoAlreadyExistsError">That Username and password already exist</string>
+    <string name="passwordsDontMatchError">Your passwords do not match</string>
+</resources>
