@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:tools = "http://schemas.android.com/tools"
+    android:layout_width = "fill_parent"
+    android:layout_height = "fill_parent"
+    android:gravity = "center"
+    android:orientation = "vertical"
+    >
+
+  <TextView
+      android:layout_width="300dp"
+      android:layout_height="30dp"
+      android:text = ""
+      android:textColor="@color/design_default_color_error"
+      android:id="@+id/errorTextView"
+      />
+  <TextView
+      android:layout_width="300dp"
+      android:layout_height="30dp"
+      android:text = "@string/signUpName"
+      />
+
+  <EditText
+      android:layout_width="300dp"
+      android:layout_height="40dp"
+      android:id="@+id/userNameSignUpEditText"
+    />
+
+  <TextView
+      android:layout_width="300dp"
+      android:layout_height="30dp"
+      android:text = "@string/signUpEmail"
+      />
+
+  <EditText
+      android:layout_width="300dp"
+      android:layout_height="40dp"
+      android:id="@+id/emailSignUpEditText"
+      />
+
+  <TextView
+      android:layout_width="300dp"
+      android:layout_height="30dp"
+      android:text = "@string/signUpPassword"
+      />
+
+  <EditText
+      android:layout_width="300dp"
+      android:layout_height="40dp"
+      android:inputType="textPassword"
+      android:id="@+id/passwordSignUpEditText"
+      />
+
+  <TextView
+      android:layout_width="300dp"
+      android:layout_height="30dp"
+      android:text = "@string/signUpRePassword"
+      />
+
+  <EditText
+      android:layout_width="300dp"
+      android:layout_height="40dp"
+      android:inputType="textPassword"
+      android:id="@+id/reenterPasswordSignUpEditText"
+      />
+
+  <Button
+      android:layout_width="120dp"
+      android:layout_height="60dp"
+      android:layout_marginVertical="10dp"
+      android:text="@string/signUp"
+      android:id="@+id/signUpButton"
+      />
+</LinearLayout>
