@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "488729896622",
+    "project_id": "cs455-2b78a",
+    "storage_bucket": "cs455-2b78a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488729896622:android:76f9f3ee8543a13317af3f",
+        "android_client_info": {
+          "package_name": "com.brandon.hangtime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488729896622-7v9j5khgkfj018ruoptd26vnkasp4rr8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEuDzoyZLcm-kt9cje7DzXufdFfW66F7I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488729896622-7v9j5khgkfj018ruoptd26vnkasp4rr8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

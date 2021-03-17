@@ -1,11 +1,19 @@
 package com.brandon.hangtime
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import java.security.acl.Group
 
 class SignUp : AppCompatActivity()
 {
@@ -16,6 +24,7 @@ class SignUp : AppCompatActivity()
     private lateinit var passwordEditText : EditText
     private lateinit var reenterPasswordEditText : EditText
     private lateinit var signUpButton : Button
+    private lateinit var auth: FirebaseAuth
 
     // start of call back overrides   **********   start of call back overrides   **********   start of call back overrides
     override fun onCreate(savedInstanceState: Bundle?)
@@ -26,6 +35,7 @@ class SignUp : AppCompatActivity()
         setWidgets()
         setSignUpButtonListener()
 
+        auth = Firebase.auth
 
         val message = savedInstanceState?.getString("Error Message")
         if (message != null)
@@ -35,6 +45,12 @@ class SignUp : AppCompatActivity()
     override fun onStart()
     {
         super.onStart()
+        super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        if(currentUser != null){
+            reload();
+        }
     }
 
     override fun onResume()
@@ -83,6 +99,7 @@ class SignUp : AppCompatActivity()
     {
         signUpButton.setOnClickListener {
 
+            errorTextView.text = ""
             if( ! allEditTextsFilled())
             {
                 // tells the user to enter info in all the fields
@@ -95,11 +112,11 @@ class SignUp : AppCompatActivity()
                 passwordEditText.setText("")
                 reenterPasswordEditText.setText("")
             }
-            else if (userInfoAlreadyExists())
+            /*else if (userInfoAlreadyExists()) //No longer needed because of how google auth handles this.
             {
                 // tells the user that their sign in info already exists
                 errorTextView.text = getString(R.string.infoAlreadyExistsError)
-            }
+            }*/
             else
                 submitSignUpInfo()
         }
@@ -108,7 +125,7 @@ class SignUp : AppCompatActivity()
     // tests if the passwords are the same
     private fun passwordsAreEqual() : Boolean
     {
-        return (passwordEditText.toString() == reenterPasswordEditText.toString())
+        return (passwordEditText.text.toString() == reenterPasswordEditText.text.toString())
     }
 
     // tests to see if all of the EditTexts are filled and not empty
@@ -118,21 +135,47 @@ class SignUp : AppCompatActivity()
     }
 
     // *****************************************************************************************
-    //These two functions are for you Viktor
-    // returns true if that username and password already exist
-    private fun userInfoAlreadyExists() : Boolean
-    {
-        emailEditText.text.toString()
-        passwordEditText.text.toString()
-        return true
-    }
-
 
     private fun submitSignUpInfo()
     {
         nameEditText.text.toString()
-        emailEditText.text.toString()
-        passwordEditText.text.toString()
+
+        auth.createUserWithEmailAndPassword(emailEditText.text.toString(), passwordEditText.text.toString())
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "createUserWithEmail:success")
+                    val user = auth.currentUser
+                    updateUI(user)
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                    Toast.makeText(baseContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT).show()
+                    updateUI(null)
+                }
+            }
+
+
+    }
+
+
+    //Runs if user is already signed in. Should redirect them to MainActivity
+    private fun reload(){
+
+    }
+
+
+    private fun updateUI(user: FirebaseUser?) {
+        if(user != null){
+            val intent = Intent(this, GroupList::class.java)
+            startActivity(intent)
+        }
+    }
+
+
+    companion object {
+        private const val TAG = "EmailPassword"
     }
 
 }

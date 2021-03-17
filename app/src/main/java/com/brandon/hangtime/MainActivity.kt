@@ -9,6 +9,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.util.Log
 import android.widget.TextView
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity()
 {
@@ -20,6 +25,8 @@ class MainActivity : AppCompatActivity()
     private lateinit var passwordEditText : EditText
 
     private lateinit var invalidLogin : TextView
+
+    private lateinit var auth: FirebaseAuth
 
     // I have a text change listener however it is always fires whenever
     // we create the activity which breaks the program logic so this bool
@@ -36,6 +43,7 @@ class MainActivity : AppCompatActivity()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        auth = Firebase.auth
         // setup all widget references and event listeners
         setButtons()
         setEditTexts()
@@ -55,6 +63,11 @@ class MainActivity : AppCompatActivity()
     override fun onStart()
     {
         super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        if(currentUser != null){
+            reload();
+        }
     }
 
     override fun onResume()
@@ -111,7 +124,6 @@ class MainActivity : AppCompatActivity()
         invalidLogin = findViewById(R.id.invalidLogin)
     }
 
-
     // gets the username text from the username EditText widget
     private fun getUsernameText() : String
     {
@@ -141,24 +153,22 @@ class MainActivity : AppCompatActivity()
         // the login credentials are correct and if they are
         // we will then go to the grouplist activity
         loginButton.setOnClickListener{
-            val userName = getUsernameText()
-            val password = getPasswordText()
 
-            // if the user has valid login credentials we will move the the group list activity
-            if(validLoginVerification())
-            {
-                // move to the grouplist activity
-                val intent = Intent(this, GroupList::class.java)
-                startActivity(intent)
-            }
-            else
-            {
-                // display invalid login
-                passwordEditText.setText("")
-
-                setInvalidLoginVisibility(true)
-            }
-
+            auth.signInWithEmailAndPassword(getUsernameText(), getPasswordText())
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithEmail:success")
+                        val user = auth.currentUser
+                        updateUI(user)
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithEmail:failure", task.exception)
+                        Toast.makeText(baseContext, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show()
+                        updateUI(null)
+                    }
+                }
         }
 
         // when clicked the login button take us to the sign up page
@@ -209,4 +219,30 @@ class MainActivity : AppCompatActivity()
             return true // change this later to see if we get a valid login or not ************************************************************
 
     }
+
+    private fun reload(){
+    }
+
+
+    private fun updateUI(user: FirebaseUser?) {
+
+        if (user != null){
+            // move to the grouplist activity
+            val intent = Intent(this, GroupList::class.java)
+            startActivity(intent)
+        }
+        else {
+            // display invalid login
+            passwordEditText.setText("")
+            setInvalidLoginVisibility(true)
+        }
+    }
+
+
+    companion object {
+        private const val TAG = "EmailPassword"
+    }
+
+
+
 }
