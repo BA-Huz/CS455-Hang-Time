@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity()
     private lateinit var loginButton : Button
     private lateinit var newUserButton : Button
 
-    private lateinit var usernameEditText : EditText
+    private lateinit var emailEditText : EditText
     private lateinit var passwordEditText : EditText
 
     private lateinit var invalidLogin : TextView
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity()
     // sets the TextEdit objects to reference the xml widgets
     private fun setEditTexts()
     {
-        usernameEditText = findViewById(R.id.usernameEditText)
+        emailEditText = findViewById(R.id.emailEditText)
         passwordEditText = findViewById((R.id.passwordEditText))
     }
 
@@ -125,15 +125,15 @@ class MainActivity : AppCompatActivity()
     }
 
     // gets the username text from the username EditText widget
-    private fun getUsernameText() : String
+    private fun getEmailText() : String
     {
-        return usernameEditText.text.toString()
+        return removeEndingWhiteSpaces(emailEditText.text.toString())
     }
 
     // gets the password text from the password EditText widget
     private fun getPasswordText() : String
     {
-        return passwordEditText.text.toString()
+        return removeEndingWhiteSpaces(passwordEditText.text.toString())
     }
 
     // Sets the visibility of the invalid login message
@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity()
         // we will then go to the grouplist activity
         loginButton.setOnClickListener{
 
-            auth.signInWithEmailAndPassword(getUsernameText(), getPasswordText())
+            auth.signInWithEmailAndPassword(getEmailText(), getPasswordText())
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
@@ -209,15 +209,18 @@ class MainActivity : AppCompatActivity()
         })
     }
 
-    // This function will test if the inputed username and password are valid and
-    // corrospond to a user in the back end
-    private fun validLoginVerification() : Boolean
+    // using autofill will add a space after the auto fill so this function will stop a user from
+    // intentionally or unintentionally having white spaces at the end of a string
+    private fun removeEndingWhiteSpaces(s : String) : String
     {
-        if(getPasswordText() == "" || getUsernameText() == "")
-            return false
-        else
-            return true // change this later to see if we get a valid login or not ************************************************************
-
+        var n = s.length - 1
+        var numOfSpaces = 0
+        while((s[n] == ' ' || s[n] == '\n') || s[n] == '\t')
+        {
+            numOfSpaces++
+            n--
+        }
+        return s.dropLast(numOfSpaces)
     }
 
     private fun reload(){

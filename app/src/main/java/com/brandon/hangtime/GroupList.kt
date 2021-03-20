@@ -72,7 +72,8 @@ class GroupList : AppCompatActivity()
         }
 
         personalScheduleButton.setOnClickListener{
-            // put code here for what will happen when you click on the personal schedule button *********************************************
+            val intent = Intent(this, PersonalSchedule::class.java)
+            startActivity(intent)
         }
 
         logOutButton.setOnClickListener{

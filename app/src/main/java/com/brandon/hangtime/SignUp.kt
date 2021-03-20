@@ -125,13 +125,13 @@ class SignUp : AppCompatActivity()
     // tests if the passwords are the same
     private fun passwordsAreEqual() : Boolean
     {
-        return (passwordEditText.text.toString() == reenterPasswordEditText.text.toString())
+        return (removeEndingWhiteSpaces(passwordEditText.text.toString()) == removeEndingWhiteSpaces(reenterPasswordEditText.text.toString()))
     }
 
     // tests to see if all of the EditTexts are filled and not empty
     private fun allEditTextsFilled() : Boolean
     {
-        return !((nameEditText.text.toString() == ""|| emailEditText.text.toString() == "") || (passwordEditText.text.toString() == "" || reenterPasswordEditText.text.toString() == ""))
+        return !((removeEndingWhiteSpaces(nameEditText.text.toString()) == ""|| removeEndingWhiteSpaces(emailEditText.text.toString()) == "") || (removeEndingWhiteSpaces(passwordEditText.text.toString()) == "" || removeEndingWhiteSpaces(reenterPasswordEditText.text.toString()) == ""))
     }
 
     // *****************************************************************************************
@@ -140,7 +140,7 @@ class SignUp : AppCompatActivity()
     {
         nameEditText.text.toString()
 
-        auth.createUserWithEmailAndPassword(emailEditText.text.toString(), passwordEditText.text.toString())
+        auth.createUserWithEmailAndPassword(removeEndingWhiteSpaces(emailEditText.text.toString()), removeEndingWhiteSpaces(passwordEditText.text.toString()))
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
@@ -173,6 +173,19 @@ class SignUp : AppCompatActivity()
         }
     }
 
+    // using autofill will add a space after the auto fill so this function will stop a user from
+    // intentionally or unintentionally having white spaces at the end of a string
+    private fun removeEndingWhiteSpaces(s : String) : String
+    {
+        var n = s.length - 1
+        var numOfSpaces = 0
+        while((s[n] == ' ' || s[n] == '\n') || s[n] == '\t')
+        {
+            numOfSpaces++
+            n--
+        }
+        return s.dropLast(numOfSpaces)
+    }
 
     companion object {
         private const val TAG = "EmailPassword"
