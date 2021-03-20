@@ -2,18 +2,20 @@ package com.brandon.hangtime
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.CalendarView
+import androidx.fragment.app.Fragment
+
 
 class PersonalSchedule : AppCompatActivity()
 {
-    private lateinit var calendarView : CalendarView
+    private lateinit var calendarFragment : Fragment
+    private lateinit var eventListFragment : Fragment
+    private lateinit var eventEditorFragment : Fragment
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_personal_schedule)
 
-        calendarView = findViewById(R.id.personalCalendar)
     }
 
 

@@ -22,4 +22,6 @@
     <string name="create_new_group">Create New Group</string>
     <string name="personal_schedule">Personal Schedule</string>
     <string name="log_out">Log Out</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
