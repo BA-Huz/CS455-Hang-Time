@@ -3,7 +3,6 @@ package com.brandon.hangtime
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -12,8 +11,8 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.security.acl.Group
 
 class SignUp : AppCompatActivity()
 {
@@ -49,7 +48,7 @@ class SignUp : AppCompatActivity()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         if(currentUser != null){
-            reload();
+            reload()
         }
     }
 
@@ -138,14 +137,13 @@ class SignUp : AppCompatActivity()
 
     private fun submitSignUpInfo()
     {
-        nameEditText.text.toString()
-
         auth.createUserWithEmailAndPassword(removeEndingWhiteSpaces(emailEditText.text.toString()), removeEndingWhiteSpaces(passwordEditText.text.toString()))
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
+                    updateFirestore(user,nameEditText.text.toString())
                     updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
@@ -156,6 +154,27 @@ class SignUp : AppCompatActivity()
                 }
             }
 
+
+    }
+
+
+
+    private fun updateFirestore(fbUser: FirebaseUser?, name: String){
+        val db = Firebase.firestore
+        if(fbUser == null) return
+
+        val user = hashMapOf(
+                "UUID" to fbUser.uid,
+                "email" to fbUser.email,
+                "name" to removeEndingWhiteSpaces(name)
+        )
+
+        db.collection("users").document().set(user).addOnSuccessListener { documentReference ->
+            Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
+        }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error adding document", e)
+                }
 
     }
 
