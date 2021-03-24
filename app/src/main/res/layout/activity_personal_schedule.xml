@@ -13,20 +13,31 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-    <fragment
+    android:orientation="vertical"
+    android:weightSum="10">
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/personalCalendarFragment"
-        app:layout_constraintTop_toTopOf="parent"
-        android:name="com.brandon.hangtime.FragmentPersonalCalendar"/>
+        android:layout_height="0dp"
+        android:layout_weight="4.5"
+        android:id="@+id/personalCalendarTopFragment"
+        app:layout_constraintTop_toTopOf="parent"/>
+        <!--android:name="com.brandon.hangtime.FragmentPersonalCalendar"-->
 
-    <fragment
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4.5"
         android:id="@+id/personalEventListFragment"
-        android:name="com.brandon.hangtime.FragmentPersonalEventList"
         app:layout_constraintBottom_toBottomOf="parent"/>
+        <!--android:name="com.brandon.hangtime.FragmentPersonalEventList"-->
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="New Event/Back To Calendar"
+        android:id = "@+id/personalEventCalendarSwapButton"/>
+
 
 </LinearLayout>
 
