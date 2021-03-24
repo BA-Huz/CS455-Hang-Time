@@ -17,4 +17,6 @@ class FragmentPersonalEventList : Fragment()
     {
         return inflater.inflate(R.layout.fragment_personal_event_list, container, false)
     }
+
+
 }

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ListView
+import com.google.firebase.auth.FirebaseAuth
 
 class GroupList : AppCompatActivity()
 {
@@ -77,6 +78,7 @@ class GroupList : AppCompatActivity()
         }
 
         logOutButton.setOnClickListener{
+            FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
