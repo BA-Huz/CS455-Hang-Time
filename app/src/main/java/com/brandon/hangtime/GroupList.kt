@@ -69,7 +69,8 @@ class GroupList : AppCompatActivity()
     private fun setButtonListeners()
     {
         newGroupButton.setOnClickListener{
-            // put code here for what will happen when you click on the new group button ***************************************************
+            val intent = Intent(this, GroupCreate::class.java)
+            startActivity(intent)
         }
 
         personalScheduleButton.setOnClickListener{
