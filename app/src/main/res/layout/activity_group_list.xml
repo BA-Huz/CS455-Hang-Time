@@ -23,7 +23,8 @@
             android:layout_height="60dp"
             android:text="@string/create_new_group"
             android:textSize="12sp"
-            android:layout_marginStart="3dp"/>
+            android:layout_marginStart="3dp"
+            />
 
             <Button
             android:id="@+id/personalScheduleButton"
@@ -31,7 +32,8 @@
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:text="@string/personal_schedule"
-            android:textSize="12sp" android:layout_marginStart="3dp"
+            android:textSize="12sp"
+            android:layout_marginStart="3dp"
             />
         <Button
             android:id="@+id/logOutButton"
