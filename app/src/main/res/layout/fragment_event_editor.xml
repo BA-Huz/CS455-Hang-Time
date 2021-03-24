@@ -39,6 +39,10 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Non Repetitive"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Daily Event"/>
         <RadioButton
             android:layout_width="wrap_content"
