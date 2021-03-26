@@ -1,5 +1,8 @@
 package com.brandon.hangtime
 
+import java.time.LocalDateTime
+
+
 class FirebaseDataObjects {
 
     data class User(
@@ -9,4 +12,13 @@ class FirebaseDataObjects {
     ) {
         override fun toString(): String = email
     }
+
+    data class Event(
+            val name: String?,
+            val startDateTime: LocalDateTime,
+            val endDateTime: LocalDateTime,
+            val owner: String,
+            val description: String? = null,
+            val participants: List<String>? = null
+            )
 }

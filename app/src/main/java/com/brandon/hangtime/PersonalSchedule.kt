@@ -1,5 +1,6 @@
 package com.brandon.hangtime
 
+import android.app.AlertDialog.THEME_HOLO_LIGHT
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,14 @@ import android.widget.FrameLayout
 import java.util.*
 import android.widget.DatePicker
 import android.widget.TimePicker
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.type.DateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.Month
 
 /*
     Help for implementing pop ups was taken from Tutorialspoint.com
@@ -35,19 +44,8 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     // this variable will determine which fragment to load when we swap fragments
     private var startTimePicker = true
 
-    // these wll be filled by a calendar instance
-    private var day = 0
-    private var month = 0
-    private var year = 0
-    private var hour = 0
-    private var minute = 0
 
-    // s for saved, these values will be filled by the users input
-    private var sday = 0
-    private var smonth = 0
-    private var syear = 0
-    private var shour = 0
-    private var sminute = 0
+    private lateinit var eventDate: LocalDateTime
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -79,16 +77,6 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         bottomFragment = FragmentPersonalEventList()
     }
 
-    // grabs the current time from a calendar instance
-    private fun setCalendarVals()
-    {
-        val c = Calendar.getInstance()
-        day = c.get(Calendar.DAY_OF_MONTH)
-        month = c.get(Calendar.MONTH)
-        year = c.get(Calendar.YEAR)
-        hour = c.get(Calendar.HOUR)
-        minute = c.get(Calendar.MINUTE)
-    }
 
     //the function name is self explanitory
     private fun setListeners()
@@ -104,7 +92,6 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
                 swapButton.text = "Back to calendar"
                 isShowingCalendar = false
-               // makePopUp(true)
             }
             else
             {
@@ -124,10 +111,10 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     internal fun makeTimePopUp(startTimePicker : Boolean)
     {
         this.startTimePicker = startTimePicker
-        setCalendarVals()
 
+        val now: LocalDate = LocalDate.now()
         //give the info to the dialog constructor as well as a reference to our version of its onDateSet
-        val dpd = DatePickerDialog(this, this, year, month, day)
+        val dpd = DatePickerDialog(this, this, now.year, now.monthValue-1, now.dayOfMonth)
         dpd.datePicker.minDate = Calendar.getInstance().timeInMillis
         dpd.show()
     // show the dialog pop up
@@ -137,21 +124,18 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     // we set it to also make a timePickerDialog
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int)
     {
-        sday = dayOfMonth
-        syear = year
-        smonth = month
+        val now: LocalTime = LocalTime.now()
+        eventDate = LocalDateTime.of(year, month,dayOfMonth+1,0,0)
 
-        setCalendarVals()
         // create a timePicker Dialog
-        var tpd = TimePickerDialog(this, 3,this, hour, minute, false)
+        var tpd = TimePickerDialog(this,this, now.hour, now.minute, false)
         tpd.show()
     }
 
     // overridden member of the datePickerDialog class
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int)
     {
-        shour = hourOfDay
-        sminute = minute
+        eventDate = eventDate.plusHours(hourOfDay.toLong()).plusMinutes(minute.toLong())
 
         //now we also need to send the proper info back to the fragment
         setFragmentEventEditorEditTexts()
@@ -161,44 +145,24 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     // and sends it into the FragmentEventEditor
     private fun setFragmentEventEditorEditTexts()
     {
-        var m = "AM"
-        if(shour > 12)
-        {
-            m = "PM"
-            shour -= 12
-        }
-        // I seperated each variable by a unique character
-        var msg = "$smonth-$sday*$year;$shour:$sminute#$m"
-
-        (supportFragmentManager.findFragmentByTag("TOP_FRAG_TAG") as FragmentEventEditor).setEdits(startTimePicker, msg)
+        (supportFragmentManager.findFragmentByTag("TOP_FRAG_TAG") as FragmentEventEditor).setEdits(startTimePicker, eventDate)
     }
 
-    internal fun submitNewEvent(startMsg : String, endMsg : String, eventName : String, whichRepeating : Int)
+    internal fun submitNewEvent(event:FirebaseDataObjects.Event)
     {
-        //  *****************      HEY VIKTOR      ***********************
-        //  *****************      IVE HAD TOO MUCH COFFEE TODAY      ***********************
-        //  *****************      NOW LET ME EXPLAIN HOW TO USE THESE PARAMETERS      ***********************
-        /*
-            the startMsg and endMsg hold all of the info to do with date and time for when the event starts and ends
-            you dont need to check if they are valid input, ive already done that, at this stage there good
-            whichRepeating shows which radio button is checked
-            0 is non repetitive
-            1 is daily event
-            2 is weekly event
+        val db = Firebase.firestore
 
-            the information is numbers with the exception of AM or PM that are seperated by unigue characters
+        db.collection("events").document().set(event).addOnSuccessListener { documentReference ->
+            Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
+        }
+        .addOnFailureListener { e ->
+            Log.w(TAG, "Error adding document", e)
+        }
 
-      ***      msg = "$smonth-$sday*$year;$shour:$sminute#$m"  take a look at the above function to get an idea     ***
-
-            if you want to extract the hour out of startMsg you can do this
-            val hour = startMsg.substring(startMessage.indexOf(';')+1, startMessage.indexOf(':'))
-            this is because before the hour is the unique char ; and after is :
-
-            however this will not account for am or pm, its in 12 hour not 24 hour time. so to determine if its
-            10:00 in 24 hour time or 22:00 in 24 hour time you can
-            if(startMsg.substring(startMessage.indexOf('#')+1) == "AM")
-                // your in the morning
-
-         */
     }
+
+    companion object {
+        private const val TAG = "PersonalSchedule"
+    }
+
 }
