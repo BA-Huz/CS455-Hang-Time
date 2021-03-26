@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"
     xmlns:tools = "http://schemas.android.com/tools"
     android:layout_width = "fill_parent"
-    android:layout_height = "fill_parent"
+    android:layout_height = "wrap_content"
     android:gravity = "top"
     android:orientation = "vertical">
 
@@ -14,17 +14,21 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text" />
+        android:inputType="text"
+        android:id="@+id/personalEventNameEditText"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Event Start Time"/>
 
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="datetime" />
+        android:inputType="time"
+        android:id="@+id/personalEventStartTimeEditText"/>
+
 
     <TextView
         android:layout_width="match_parent"
@@ -34,38 +38,39 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="datetime" />
+        android:inputType="datetime"
+        android:id="@+id/personalEventEndTimeEditText"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Event Description" />
-
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text" />
 
     <RadioGroup
+        android:id="@+id/repetitiveRadios"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center">
 
         <RadioButton
+            android:id="@+id/personalEventNonRepeatingRadio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Non Repetitive"/>
         <RadioButton
+            android:id="@+id/personalEventDailyRadio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Daily Event"/>
         <RadioButton
+            android:id="@+id/personalEventWeeklyRadio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Weekly Event"/>
 
     </RadioGroup>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text = "Save"
+        android:id="@+id/savePersonalEventButton"/>
 
 </LinearLayout>
