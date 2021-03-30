@@ -110,11 +110,12 @@ public class GroupCreate : AppCompatActivity() {
          private fun addGroup(name: String, members: List<FirebaseDataObjects.User>){
                  val db = Firebase.firestore
 
-                 val group = hashMapOf(
-                         "groupName" to name,
-                         "memebers" to members.map { member -> member.UUID },
-                         "owner" to Firebase.auth.currentUser.uid
+                 val group:FirebaseDataObjects.Group = FirebaseDataObjects.Group(
+                        name,
+                        members.map{ it.UUID},
+                        Firebase.auth.currentUser.uid
                  )
+
 
                  db.collection("groups").document().set(group).addOnSuccessListener { documentReference ->
                          Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
