@@ -40,7 +40,6 @@ class GroupList : AppCompatActivity()
         setButtonListeners()
 
         loadUserGroups(Firebase.auth.currentUser.uid)
-
     }
 
     override fun onStart()
@@ -81,10 +80,10 @@ class GroupList : AppCompatActivity()
     {
         groupList = findViewById((R.id.groupList))
 
+        // ****************************************************** Figure out why this crashes
         groupList.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 val selectedGroup = userGroups[position]
-                //Modify this to change the activity to the groupCalendar ********************************
                 val intent = Intent(this,GroupCalendar::class.java)
                 intent.putExtra("group", selectedGroup)
                 startActivity(intent)
@@ -104,8 +103,13 @@ class GroupList : AppCompatActivity()
         }
 
         logOutButton.setOnClickListener{
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, MainActivity::class.java)
+            //FirebaseAuth.getInstance().signOut()
+            //val intent = Intent(this, MainActivity::class.java)
+            //startActivity(intent)
+
+            // temp
+            val intent = Intent(this,GroupCalendar::class.java)
+            //intent.putExtra("group", selectedGroup)
             startActivity(intent)
         }
     }
