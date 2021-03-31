@@ -80,7 +80,6 @@ class GroupList : AppCompatActivity()
     {
         groupList = findViewById((R.id.groupList))
 
-        // ****************************************************** Figure out why this crashes
         groupList.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 val selectedGroup = userGroups[position]
@@ -103,13 +102,8 @@ class GroupList : AppCompatActivity()
         }
 
         logOutButton.setOnClickListener{
-            //FirebaseAuth.getInstance().signOut()
-            //val intent = Intent(this, MainActivity::class.java)
-            //startActivity(intent)
-
-            // temp
-            val intent = Intent(this,GroupCalendar::class.java)
-            //intent.putExtra("group", selectedGroup)
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }
