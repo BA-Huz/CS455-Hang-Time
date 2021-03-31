@@ -84,8 +84,8 @@ class GroupList : AppCompatActivity()
         groupList.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 val selectedGroup = userGroups[position]
-                //Modify this to change the activity to the groupCalendar
-                val intent = Intent(this,FragmentPersonalCalendar::class.java)
+                //Modify this to change the activity to the groupCalendar ********************************
+                val intent = Intent(this,GroupCalendar::class.java)
                 intent.putExtra("group", selectedGroup)
                 startActivity(intent)
             }

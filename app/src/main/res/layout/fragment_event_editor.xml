@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:inputType="datetime"
         android:id="@+id/personalEventEndTimeEditText"/>
-
+<!-- We may add this in later
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:inputType="datetime"
         android:id="@+id/DescriptionEditText"/>
-
+-->
 
     <RadioGroup
         android:id="@+id/repetitiveRadios"

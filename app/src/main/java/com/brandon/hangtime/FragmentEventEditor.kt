@@ -52,7 +52,7 @@ class FragmentEventEditor : Fragment()
         endTimeWidget.inputType = InputType.TYPE_NULL
 
         eventNameWidget = v.findViewById(R.id.personalEventNameEditText)
-        eventDescriptionWidget = v.findViewById(R.id.DescriptionEditText)
+        //eventDescriptionWidget = v.findViewById(R.id.DescriptionEditText)
 
        // repetitiveRadioGroup = v.findViewById(R.id.repetitiveRadios)
 
@@ -89,7 +89,7 @@ class FragmentEventEditor : Fragment()
                             startDate,
                             endDate,
                             Firebase.auth.currentUser.uid,
-                            eventDescriptionWidget.text.toString()
+                            ""//eventDescriptionWidget.text.toString()
                     )
                     (activity as PersonalSchedule).submitNewEvent(event)
                 }

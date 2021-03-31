@@ -114,8 +114,8 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         val now: LocalDate = LocalDate.now()
         //give the info to the dialog constructor as well as a reference to our version of its onDateSet
-        val dpd = DatePickerDialog(this, this, now.year, now.monthValue-1, now.dayOfMonth)
-        dpd.datePicker.minDate = Calendar.getInstance().timeInMillis
+        val dpd = DatePickerDialog(this, this, now.year, now.monthValue-1 , now.dayOfMonth)//now.monthValue-1
+        dpd.datePicker.minDate = Calendar.getInstance().timeInMillis //Later on we can change this so that if this is the end time it sets the min to be the start time and date
         dpd.show()
     // show the dialog pop up
     }
@@ -125,7 +125,7 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int)
     {
         val now: LocalTime = LocalTime.now()
-        eventDate = LocalDateTime.of(year, month,dayOfMonth+1,0,0)
+        eventDate = LocalDateTime.of(year, month+1,dayOfMonth,0,0)//dayOfMonth+1
 
         // create a timePicker Dialog
         var tpd = TimePickerDialog(this,this, now.hour, now.minute, false)
