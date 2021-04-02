@@ -43,6 +43,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/scrollView"
         app:layout_constraintTop_toBottomOf="@id/dayBar">
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,10 +59,14 @@
             app:layout_constraintStart_toStartOf="parent">
             <!--android:weightSum="24"-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:text="1:00 AM"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="12:00 AM"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="1:00 AM"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -150,33 +155,31 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:text="11:00 PM"/>
-            <TextView
+            <!--this view is so the bar at the bottom with menu home and back does not cover the last textview-->
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="12:00 AM"/>
+                android:layout_height="60dp"/>
         </LinearLayout>
 
-        <LinearLayout
+        <ImageView
             android:id="@+id/groupCalendarDay1"
             android:layout_width="0dp"
             android:layout_weight="5"
-            android:layout_height="1440dp"
-            android:background="@color/design_default_color_error"
+            android:layout_height="1475dp"
             android:orientation="vertical"
             app:layout_constraintLeft_toRightOf="@id/groupCalendarTimeLayout"
             app:layout_constraintRight_toLeftOf="@id/groupCalendarDay2">
-        </LinearLayout>
+        </ImageView>
 
-        <LinearLayout
+        <ImageView
             android:id="@+id/groupCalendarDay2"
             android:layout_width="0dp"
             android:layout_weight="5"
-            android:layout_height="1440dp"
-            android:background="@color/purple_700"
+            android:layout_height="1475dp"
             android:orientation="vertical"
             app:layout_constraintLeft_toRightOf="@id/groupCalendarDay1"
             app:layout_constraintRight_toRightOf="parent">
-        </LinearLayout>
+        </ImageView>
 
     </LinearLayout>
     </ScrollView>

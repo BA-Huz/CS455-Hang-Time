@@ -32,4 +32,13 @@ class FirebaseDataObjects {
         override fun toString():String = groupName
     }
 
+    // this data class is not used directly with fire base
+    // but it is used for the algorithm to draw events
+    // in the group calendar
+    data class EventTimeComponent(
+            val hour : Int,
+            val minute : Int,
+            val isStart : Boolean
+    )
+
 }
