@@ -2,14 +2,17 @@ package com.brandon.hangtime
 
 import android.os.Bundle
 import android.text.InputType
+import android.text.format.Time
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
+import java.util.*
 
 
 class FragmentEventEditor : Fragment()
@@ -84,6 +87,7 @@ class FragmentEventEditor : Fragment()
                 if(endDate<startDate) {
                     Toast.makeText(activity as PersonalSchedule, "The event must end after it starts", Toast.LENGTH_SHORT).show()
                 } else{
+
                     val event = FirebaseDataObjects.Event(
                             eventNameWidget.text.toString(),
                             startDate,

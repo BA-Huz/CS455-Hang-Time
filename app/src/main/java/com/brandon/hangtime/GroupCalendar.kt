@@ -9,10 +9,14 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import com.brandon.hangtime.FirebaseDataObjects.toLocalDateTime
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import java.lang.Math.abs
 import java.text.DateFormat
@@ -70,7 +74,7 @@ class GroupCalendar : AppCompatActivity()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_calendar)
 
-        setLateinits()
+        setLateInits()
         setListeners()
 
         var temp = findViewById<LinearLayout>(R.id.dayBar)
@@ -80,11 +84,11 @@ class GroupCalendar : AppCompatActivity()
             loadColumns()
         }
 
-        getEvents()
+        getEvents(LocalDateTime.now())
     }
 
 
-    private fun setLateinits()
+    private fun setLateInits()
     {
         scrollView = findViewById(R.id.scrollView)
 
@@ -153,9 +157,9 @@ class GroupCalendar : AppCompatActivity()
     }
 
     // Grabs events from the database that happen on the 31st of march and puts them into the events list
-    private fun getEvents()
+    private fun getEvents(firstDate:LocalDateTime)
     {
-        val startDate1 = LocalDateTime.of(2021, Month.APRIL, 1, 3, 0)
+        /*val startDate1 = LocalDateTime.of(2021, Month.APRIL, 1, 3, 0)
         val endDate1 = LocalDateTime.of(2021, Month.APRIL, 2, 6, 5)
         val startDate2 = LocalDateTime.of(2021, Month.APRIL, 2, 5, 0)
         val endDate2 = LocalDateTime.of(2021, Month.APRIL, 2, 9, 30)
@@ -171,7 +175,30 @@ class GroupCalendar : AppCompatActivity()
         var e4 = FirebaseDataObjects.Event("e4", startDate4, endDate4, "Alex","")
 
         events = listOf<FirebaseDataObjects.Event>(e1, e2, e3, e4)
-        numberInGroup = 4
+        numberInGroup = 4*/
+        val eventsColl = Firebase.firestore.collection("events")
+
+        var events:List<FirebaseDataObjects.Event> = listOf()
+
+
+        eventsColl
+                .whereGreaterThanOrEqualTo("endDateTime.dayOfYear",firstDate.dayOfYear)
+                .whereEqualTo("endDateTime.year",firstDate.year)
+                //Replace listOf<String><() with a list of the uuid of all memebers within the group.
+                //.whereArrayContainsAny("participants", listOf<String>())
+                .get().addOnSuccessListener { result ->
+                    events = result!!.map { snapshot ->
+                        snapshot.toObject<FirebaseDataObjects.Event>()
+                    }
+                //Successful retrieval listener code goes here
+                    Log.d(TAG, events.toString())
+        }
+         .addOnFailureListener { exception ->
+             Log.d(TAG, "Error getting documents: ", exception)
+         }
+
+
+
     }
 
     // this function is called before the first region is drawn
@@ -242,25 +269,30 @@ class GroupCalendar : AppCompatActivity()
         // put nessicary info into the left and right days
         for(e in events)
         {
+           /* val start = toLocalDateTime(e.startDateTime)
+            val end = toLocalDateTime(e.endDateTime)*/
+
+            val start = e.startDateTime
+            val end = e.endDateTime
             // put start time in left day
-            if(e.startDateTime.dayOfMonth == displayedLeftDay.dayOfMonth)
+            if(start.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(e.startDateTime.hour, e.startDateTime.minute, true)
+                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true)
                 parsedEventsLeftDay.add(toAdd)
                 // if it ends after left day
-                if (e.endDateTime.dayOfMonth > displayedLeftDay.dayOfMonth)
+                if (end.dayOfMonth > displayedLeftDay.dayOfMonth)
                 {
                     val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false)
                     parsedEventsLeftDay.add(toAdd)
                 }
             }
             // put start time in right day
-            else if(e.startDateTime.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
+            else if(start.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(e.startDateTime.hour, e.startDateTime.minute, true)
+                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true)
                 parsedEventsRightDay.add(toAdd)
                 // if it ends after right day
-                if (e.endDateTime.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
+                if (end.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
                 {
                     val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false)
                     parsedEventsRightDay.add(toAdd)
@@ -268,24 +300,24 @@ class GroupCalendar : AppCompatActivity()
             }
 
             // put end time in left day
-            if(e.endDateTime.dayOfMonth == displayedLeftDay.dayOfMonth)
+            if(end.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(e.endDateTime.hour, e.endDateTime.minute, false)
+                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false)
                 parsedEventsLeftDay.add(toAdd)
                 // if it starts before left day
-                if (e.startDateTime.dayOfMonth < displayedLeftDay.dayOfMonth)
+                if (start.dayOfMonth < displayedLeftDay.dayOfMonth)
                 {
                     val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true)
                     parsedEventsLeftDay.add(toAdd)
                 }
             }
             // put end time in right day
-            else if(e.endDateTime.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
+            else if(end.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(e.endDateTime.hour, e.endDateTime.minute, false)
+                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false)
                 parsedEventsRightDay.add(toAdd)
                 // if it starts before right day
-                if (e.startDateTime.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth)
+                if (start.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth)
                 {
                     val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true)
                     parsedEventsRightDay.add(toAdd)
@@ -293,7 +325,7 @@ class GroupCalendar : AppCompatActivity()
             }
 
             //if an event starts before and ends after the left day
-            if(e.startDateTime.dayOfMonth < displayedLeftDay.dayOfMonth && e.endDateTime.dayOfMonth > displayedLeftDay.dayOfMonth)
+            if(start.dayOfMonth < displayedLeftDay.dayOfMonth && end.dayOfMonth > displayedLeftDay.dayOfMonth)
             {
                 var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true)
                 parsedEventsLeftDay.add(toAdd)
@@ -302,7 +334,7 @@ class GroupCalendar : AppCompatActivity()
             }
 
             //if an event starts before and ends after the right day
-            if(e.startDateTime.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth && e.endDateTime.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
+            if(start.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth && end.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
             {
                 var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true)
                 parsedEventsRightDay.add(toAdd)
@@ -428,7 +460,12 @@ class GroupCalendar : AppCompatActivity()
 
         leftDay.text = "${displayedLeftDay.month.toString()}   ${displayedLeftDay.dayOfMonth}"
         rightDay.text = "${displayedLeftDay.plusDays(1).month.toString()}   ${displayedLeftDay.plusDays(1).dayOfMonth}"
-        getEvents()
+        getEvents(LocalDateTime.now())//This should be changed to whatever the leftmost displayed day is. Or maybe that minus 1
         loadColumns()
+    }
+
+
+    companion object {
+        private const val TAG = "GroupCalendar"
     }
 }
