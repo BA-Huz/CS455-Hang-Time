@@ -1,10 +1,13 @@
 package com.brandon.hangtime
 
+import com.google.firebase.Timestamp
 import java.io.Serializable
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.*
 
 
-class FirebaseDataObjects {
+object FirebaseDataObjects {
 
     data class User(
             val UUID: String = "",
@@ -16,13 +19,19 @@ class FirebaseDataObjects {
 
 
     data class Event(
-            val name: String? = null,
-            val startDateTime: LocalDateTime,
-            val endDateTime: LocalDateTime,
+            val name: String = "",
+            val startDateTime: Timestamp? = null,
+            val endDateTime: Timestamp? =  null,
             val owner: String = "",
             val description: String? = null,
-            val participants: List<String>? = null
-            ) : Serializable
+            val participants: List<String>? = null,
+            val group: String? = null
+            ) : Serializable {
+        override fun toString(): String = name
+    }
+
+
+
 
     data class Group(
             val groupName: String = "",
@@ -40,5 +49,15 @@ class FirebaseDataObjects {
             val minute : Int,
             val isStart : Boolean
     )
+
+
+    fun toTimestamp(ldt:LocalDateTime):Timestamp {
+        return Timestamp(Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant()))
+    }
+
+    fun toLocalDateTime(ts:Timestamp):LocalDateTime{
+        return LocalDateTime.ofInstant(ts.toDate().toInstant(), ZoneId.systemDefault())
+    }
+
 
 }
