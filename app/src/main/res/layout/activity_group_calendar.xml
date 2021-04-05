@@ -166,7 +166,7 @@
             android:id="@+id/groupCalendarDay1"
             android:layout_width="0dp"
             android:layout_weight="5"
-            android:layout_height="1475dp"
+            android:layout_height="1545dp"
             android:orientation="vertical"
             app:layout_constraintLeft_toRightOf="@id/groupCalendarTimeLayout"
             app:layout_constraintRight_toLeftOf="@id/groupCalendarDay2">
@@ -176,7 +176,7 @@
             android:id="@+id/groupCalendarDay2"
             android:layout_width="0dp"
             android:layout_weight="5"
-            android:layout_height="1475dp"
+            android:layout_height="1545dp"
             android:orientation="vertical"
             app:layout_constraintLeft_toRightOf="@id/groupCalendarDay1"
             app:layout_constraintRight_toRightOf="parent">
@@ -184,6 +184,18 @@
 
     </LinearLayout>
     </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center">
+        <Button
+            android:layout_height="70dp"
+            android:layout_width="match_parent"
+            android:text = "Schedule a Group Event"
+            android:id="@+id/GroupEventButton"/>
+    </LinearLayout>
 
 
 

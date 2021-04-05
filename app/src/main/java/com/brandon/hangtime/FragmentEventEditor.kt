@@ -106,14 +106,38 @@ class FragmentEventEditor : Fragment()
     // time into the edit texts
     internal fun setEdits(startTimeEdit : Boolean, eventTime:LocalDateTime)
     {
-        if(startTimeEdit)
+        var h = ""
+        var m = ""
+        var M = "AM"
+
+        if(eventTime.hour == 0)
+        {// time is 12 am
+            h = "12"
+        }
+        else if (eventTime.hour > 12)
         {
-            startTimeWidget.setText(eventTime.toString())
-            startDate = eventTime
+            // time is between 10pm and 12pm
+            h = "${eventTime.hour - 12}"
+            M = "PM"
         }
         else
         {
-            endTimeWidget.setText(eventTime.toString())
+            // time is between 10 am and 11 am
+            h = "${eventTime.hour}"
+        }
+
+        if(eventTime.minute < 10)
+            m = "0${eventTime.minute}"
+        else
+            m = "${eventTime.minute}"
+
+        if(startTimeEdit)
+        {
+            startTimeWidget.setText("${eventTime.month.toString()}  ${eventTime.dayOfMonth}  at  $h:$m $M")
+        }
+        else
+        {
+            endTimeWidget.setText("${eventTime.month.toString()}  ${eventTime.dayOfMonth}  at  $h:$m $M")
             endDate = eventTime
         }
     }

@@ -28,7 +28,8 @@ class GroupCalendar : AppCompatActivity()
 {
     // scalar is used to line up the event regions with the hours
     // each hour is 60dp apart in xml and in  kotlin code 180 apart
-    private val scalar = 180
+    private var scalar = 0
+    private var setScaler = false
 
     // the number of users in the current group
     // will be given a new value in get events
@@ -159,7 +160,6 @@ class GroupCalendar : AppCompatActivity()
     // Grabs events from the database that happen on the 31st of march and puts them into the events list
     private fun getEvents(firstDate:LocalDateTime)
     {
-
         val eventsColl = Firebase.firestore.collection("events")
 
         eventsColl
@@ -220,6 +220,12 @@ class GroupCalendar : AppCompatActivity()
     // this function will fill the columns with all the appropriate regions
     private fun loadColumns()
     {
+        if(!setScaler)
+        {
+            setScaler = true
+            findViewById<LinearLayout>(R.id.groupCalendarTimeLayout).apply { scalar = getChildAt(1).top - getChildAt(0).top }
+        }
+
         if( ! createdBitMapsAndCanvases)
             setBitMapsAndCanvases()
         else
