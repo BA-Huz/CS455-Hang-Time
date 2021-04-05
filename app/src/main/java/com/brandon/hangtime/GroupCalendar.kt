@@ -84,7 +84,7 @@ class GroupCalendar : AppCompatActivity()
             loadColumns()
         }
 
-        getEvents(LocalDateTime.now())
+        getEvents(LocalDate.now().atStartOfDay())
     }
 
 
@@ -159,31 +159,11 @@ class GroupCalendar : AppCompatActivity()
     // Grabs events from the database that happen on the 31st of march and puts them into the events list
     private fun getEvents(firstDate:LocalDateTime)
     {
-        /*val startDate1 = LocalDateTime.of(2021, Month.APRIL, 1, 3, 0)
-        val endDate1 = LocalDateTime.of(2021, Month.APRIL, 2, 6, 5)
-        val startDate2 = LocalDateTime.of(2021, Month.APRIL, 2, 5, 0)
-        val endDate2 = LocalDateTime.of(2021, Month.APRIL, 2, 9, 30)
-        val startDate3 = LocalDateTime.of(2021, Month.APRIL, 2, 15, 0)
-        val endDate3 = LocalDateTime.of(2021, Month.APRIL, 2, 16, 40)
-        val startDate4 = LocalDateTime.of(2021, Month.APRIL, 2, 12, 0)
-        val endDate4 = LocalDateTime.of(2021, Month.APRIL, 3, 5, 10)
 
-
-        var e1 = FirebaseDataObjects.Event("e1", startDate1, endDate1, "Alex","")
-        var e2 = FirebaseDataObjects.Event("e2", startDate2, endDate2, "Alex","")
-        var e3 = FirebaseDataObjects.Event("e3", startDate3, endDate3, "Alex","")
-        var e4 = FirebaseDataObjects.Event("e4", startDate4, endDate4, "Alex","")
-
-        events = listOf<FirebaseDataObjects.Event>(e1, e2, e3, e4)
-        numberInGroup = 4*/
         val eventsColl = Firebase.firestore.collection("events")
 
-        var events:List<FirebaseDataObjects.Event> = listOf()
-
-
         eventsColl
-                .whereGreaterThanOrEqualTo("endDateTime.dayOfYear",firstDate.dayOfYear)
-                .whereEqualTo("endDateTime.year",firstDate.year)
+                .whereGreaterThanOrEqualTo("endDateTime",FirebaseDataObjects.toTimestamp(firstDate))
                 //Replace listOf<String><() with a list of the uuid of all memebers within the group.
                 //.whereArrayContainsAny("participants", listOf<String>())
                 .get().addOnSuccessListener { result ->
@@ -196,8 +176,6 @@ class GroupCalendar : AppCompatActivity()
          .addOnFailureListener { exception ->
              Log.d(TAG, "Error getting documents: ", exception)
          }
-
-
 
     }
 
@@ -272,8 +250,6 @@ class GroupCalendar : AppCompatActivity()
             val start = toLocalDateTime(e.startDateTime!!)
             val end = toLocalDateTime(e.endDateTime!!)
 
-            /*val start = e.startDateTime
-            val end = e.endDateTime*/
             // put start time in left day
             if(start.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
@@ -458,7 +434,7 @@ class GroupCalendar : AppCompatActivity()
         else
             displayedLeftDay = displayedLeftDay.plusDays(-2)
 
-        leftDay.text = "${displayedLeftDay.month.toString()}   ${displayedLeftDay.dayOfMonth}"
+        leftDay.text = "${displayedLeftDay.month}   ${displayedLeftDay.dayOfMonth}"
         rightDay.text = "${displayedLeftDay.plusDays(1).month.toString()}   ${displayedLeftDay.plusDays(1).dayOfMonth}"
         getEvents(LocalDateTime.now())//This should be changed to whatever the leftmost displayed day is. Or maybe that minus 1
         loadColumns()

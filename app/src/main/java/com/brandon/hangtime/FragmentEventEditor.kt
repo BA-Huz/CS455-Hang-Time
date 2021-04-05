@@ -94,6 +94,7 @@ class FragmentEventEditor : Fragment()
                             FirebaseDataObjects.toTimestamp(endDate),
                             Firebase.auth.currentUser.uid,
                             ""//eventDescriptionWidget.text.toString()
+
                     )
                     (activity as PersonalSchedule).submitNewEvent(event)
                 }
