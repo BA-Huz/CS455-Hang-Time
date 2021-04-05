@@ -269,11 +269,11 @@ class GroupCalendar : AppCompatActivity()
         // put nessicary info into the left and right days
         for(e in events)
         {
-           /* val start = toLocalDateTime(e.startDateTime)
-            val end = toLocalDateTime(e.endDateTime)*/
+            val start = toLocalDateTime(e.startDateTime!!)
+            val end = toLocalDateTime(e.endDateTime!!)
 
-            val start = e.startDateTime
-            val end = e.endDateTime
+            /*val start = e.startDateTime
+            val end = e.endDateTime*/
             // put start time in left day
             if(start.dayOfMonth == displayedLeftDay.dayOfMonth)
             {

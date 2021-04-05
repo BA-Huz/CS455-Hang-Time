@@ -20,14 +20,17 @@ object FirebaseDataObjects {
 
     data class Event(
             val name: String = "",
-            val startDateTime: LocalDateTime = LocalDateTime.of(2020,1,1,0,0,0),
-            val endDateTime: LocalDateTime =  LocalDateTime.of(2020,1,1,1,0,0),
+            val startDateTime: Timestamp? = null,
+            val endDateTime: Timestamp? =  null,
             val owner: String = "",
             val description: String? = null,
-            val participants: List<String>? = null
+            val participants: List<String>? = null,
+            val group: String? = null
             ) : Serializable {
         override fun toString(): String = name
     }
+
+
 
 
     data class Group(

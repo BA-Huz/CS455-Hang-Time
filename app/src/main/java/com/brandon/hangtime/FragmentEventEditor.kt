@@ -90,8 +90,8 @@ class FragmentEventEditor : Fragment()
 
                     val event = FirebaseDataObjects.Event(
                             eventNameWidget.text.toString(),
-                            startDate,
-                            endDate,
+                            FirebaseDataObjects.toTimestamp(startDate),
+                            FirebaseDataObjects.toTimestamp(endDate),
                             Firebase.auth.currentUser.uid,
                             ""//eventDescriptionWidget.text.toString()
                     )
