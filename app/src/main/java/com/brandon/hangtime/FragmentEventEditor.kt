@@ -32,6 +32,10 @@ class FragmentEventEditor : Fragment()
     private lateinit var startDate: LocalDateTime
     private lateinit var endDate: LocalDateTime
 
+    internal enum class Parent{
+        GROUPCALENDAR, PERSONALSCHEDULE
+    }
+    private var myParent : Parent = Parent.GROUPCALENDAR
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
@@ -42,6 +46,11 @@ class FragmentEventEditor : Fragment()
         setListeners()
 
         return v
+    }
+
+    internal fun setParent(p : Parent)
+    {
+        myParent = p
     }
 
     // sets up the late inits
@@ -73,11 +82,17 @@ class FragmentEventEditor : Fragment()
         //set the startTime edittext so when clicked on the parent activity will throw
         //the correct pop up
         startTimeWidget.setOnClickListener{
-            (activity as PersonalSchedule).makeTimePopUp(true)
+            if(myParent == Parent.PERSONALSCHEDULE)
+                (activity as PersonalSchedule).makeTimePopUp(true)
+            else
+                (activity as GroupCalendar).makeTimePopUp(true)
         }
 
         endTimeWidget.setOnClickListener{
-            (activity as PersonalSchedule).makeTimePopUp(false)
+            if(myParent == Parent.PERSONALSCHEDULE)
+                (activity as PersonalSchedule).makeTimePopUp(false)
+            else
+                (activity as GroupCalendar).makeTimePopUp(false)
         }
 
         saveButton.setOnClickListener{
@@ -85,7 +100,10 @@ class FragmentEventEditor : Fragment()
             if(allFieldsFilled())
             {
                 if(endDate<startDate) {
-                    Toast.makeText(activity as PersonalSchedule, "The event must end after it starts", Toast.LENGTH_SHORT).show()
+                    if(myParent == Parent.PERSONALSCHEDULE)
+                        Toast.makeText(activity as PersonalSchedule, "The event must end after it starts", Toast.LENGTH_SHORT).show()
+                    else
+                        Toast.makeText(activity as GroupCalendar, "The event must end after it starts", Toast.LENGTH_SHORT).show()
                 } else{
 
                     val event = FirebaseDataObjects.Event(
@@ -96,7 +114,10 @@ class FragmentEventEditor : Fragment()
                             ""//eventDescriptionWidget.text.toString()
 
                     )
-                    (activity as PersonalSchedule).submitNewEvent(event)
+                    if(myParent == Parent.PERSONALSCHEDULE)
+                        (activity as PersonalSchedule).submitNewEvent(event)
+                    else
+                        (activity as GroupCalendar).submitNewEvent(event)
                 }
             }
         }
@@ -148,7 +169,10 @@ class FragmentEventEditor : Fragment()
     {
         return if(eventNameWidget.text.toString().isNullOrBlank() || (startTimeWidget.text.toString().isNullOrBlank() || endTimeWidget.text.toString().isNullOrBlank() ))
         {
-            Toast.makeText(activity as PersonalSchedule, "All fields must be filled", Toast.LENGTH_SHORT).show()
+            if(myParent == Parent.PERSONALSCHEDULE)
+                Toast.makeText(activity as PersonalSchedule, "All fields must be filled", Toast.LENGTH_SHORT).show()
+            else
+                Toast.makeText(activity as GroupCalendar, "All fields must be filled", Toast.LENGTH_SHORT).show()
             false
         }
         else

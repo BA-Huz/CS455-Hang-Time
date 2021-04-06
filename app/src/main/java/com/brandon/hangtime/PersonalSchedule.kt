@@ -1,6 +1,5 @@
 package com.brandon.hangtime
 
-import android.app.AlertDialog.THEME_HOLO_LIGHT
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -11,14 +10,12 @@ import android.widget.FrameLayout
 import java.util.*
 import android.widget.DatePicker
 import android.widget.TimePicker
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.type.DateTime
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.Month
+
 
 /*
     Help for implementing pop ups was taken from Tutorialspoint.com
@@ -41,10 +38,10 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     private lateinit var eventEditorFragment : FragmentEventEditor
     private lateinit var bottomFragment : FragmentPersonalEventList
 
-    // this variable will determine which fragment to load when we swap fragments
+    // this variable will tell us if we are creating an event start time or end time
     private var startTimePicker = true
 
-
+    // used when making events
     private lateinit var eventDate: LocalDateTime
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -89,6 +86,7 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                     replace(R.id.personalCalendarTopFragment, eventEditorFragment, "TOP_FRAG_TAG")
                     commit()
                 }
+                eventEditorFragment.setParent(FragmentEventEditor.Parent.PERSONALSCHEDULE)
 
                 swapButton.text = "Back to calendar"
                 isShowingCalendar = false

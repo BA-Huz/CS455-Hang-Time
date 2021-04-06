@@ -1,5 +1,7 @@
 package com.brandon.hangtime
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -7,26 +9,35 @@ import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.brandon.hangtime.FirebaseDataObjects.toLocalDateTime
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
-import java.lang.Math.abs
-import java.text.DateFormat
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Month
+import java.time.LocalTime
+import java.util.*
 
-class GroupCalendar : AppCompatActivity()
+
+class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener
 {
     private var thisGroupId : String? = ""
+
+    // this variable will tell us if we are creating an event start time or end time
+    private var startTimePicker = true
+
+    // used when making events
+    private lateinit var eventDate: LocalDateTime
 
     // scalar is used to line up the event regions with the hours
     // each hour is 60dp apart in xml and in  kotlin code 180 apart
@@ -43,7 +54,7 @@ class GroupCalendar : AppCompatActivity()
 
     // the date of whichever day is displayed in the left column
     // when the first page loads it is set to the current day
-    private var displayedLeftDay = LocalDateTime.now()
+    internal var displayedLeftDay = LocalDateTime.now()
 
     private var touchDownX = -1f
     private var touchUpX = -1f
@@ -68,8 +79,13 @@ class GroupCalendar : AppCompatActivity()
     private lateinit var day1ImageView : ImageView
     private lateinit var day2ImageView : ImageView
 
-    private lateinit var leftDay : TextView
-    private lateinit var rightDay : TextView
+    private lateinit var eventButton : Button
+
+    private lateinit var twoDayViewFragment: TwoDayViewFragment
+    private lateinit var eventEditorFragment : FragmentEventEditor
+    private var showingTwoDayFragment = true
+
+    //private lateinit var loadColsJob : Job
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -80,16 +96,24 @@ class GroupCalendar : AppCompatActivity()
         thisGroupId = intent.getStringExtra("group")
 
         setLateInits()
-        setListeners()
 
-        var temp = findViewById<LinearLayout>(R.id.dayBar)
-        temp.setOnClickListener{
-            //drawRegion(true, 5f, 8.9f, groupAvailibilityColour(50, 3))
-            //drawRegion(false, 7.6f, 10.4f, groupAvailibilityColour(50, 16))
-            loadColumns()
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.topFrame, twoDayViewFragment, "TOP_FRAG")
+            commit()
         }
 
+        setListeners()
+
         getEvents(LocalDate.now().atStartOfDay())
+
+        // We cannot draw on the screen until after onCreate has finished
+        // and we also cannot touch the view from a thread that did not create
+        // the view. So to solve this we start a new coroutine  that waits half a second
+        // and then orders the main routine to execute the function chain that does the drawing
+        GlobalScope.launch{
+            Thread.sleep(500)
+            Handler(Looper.getMainLooper()).post(Runnable { loadColumns() })
+        }
     }
 
 
@@ -100,27 +124,45 @@ class GroupCalendar : AppCompatActivity()
         day1ImageView = findViewById(R.id.groupCalendarDay1)
         day2ImageView = findViewById(R.id.groupCalendarDay2)
 
-        leftDay = findViewById(R.id.day1Date)
-        leftDay.text = "${displayedLeftDay.month.toString()}   ${displayedLeftDay.dayOfMonth}"
-        rightDay = findViewById(R.id.day2Date)
-        rightDay.text = "${displayedLeftDay.plusDays(1).month.toString()}   ${displayedLeftDay.plusDays(1).dayOfMonth}"
+
+
+        eventButton = findViewById(R.id.GroupEventButton)
+
+        twoDayViewFragment = TwoDayViewFragment()
+        eventEditorFragment = FragmentEventEditor()
     }
 
     private fun setListeners()
     {
-        /*swipable.setOnTouchListener(object : View.OnTouchListener {
-            override fun onTouch(v: View, m: MotionEvent): Boolean {
-                // Perform tasks here
-                return true
+        eventButton.setOnClickListener {
+            if(eventButton.text == "Schedule a Group Event")
+            {
+                eventButton.text = "Back To Day View"
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.topFrame, eventEditorFragment, "TOP_FRAG")   // eventEditorFragment throwing exception uninitialized property access exception
+                    commit()
+                }
+                showingTwoDayFragment = false
+                eventEditorFragment.setParent(FragmentEventEditor.Parent.GROUPCALENDAR)
             }
-        })*/
-        scrollView.setOnTouchListener {v: View, m: MotionEvent ->
+            else
+            {
+                eventButton.text = "Schedule a Group Event"
+                supportFragmentManager.beginTransaction().apply{
+                    replace(R.id.topFrame, twoDayViewFragment, "TOP_FRAG")
+                    commit()
+                }
+                showingTwoDayFragment = true
+            }
+        }
+
+        scrollView.setOnTouchListener { v: View, m: MotionEvent ->
             detectedTouch(m)
             true
         }
     }
 
-    private fun detectedTouch(m : MotionEvent)
+    private fun detectedTouch(m: MotionEvent)
     {
         if(m.action == MotionEvent.ACTION_MOVE)
         {
@@ -162,12 +204,12 @@ class GroupCalendar : AppCompatActivity()
     }
 
     // Grabs events from the database that happen on the 31st of march and puts them into the events list
-    private fun getEvents(firstDate:LocalDateTime)
+    private fun getEvents(firstDate: LocalDateTime)
     {
         val eventsColl = Firebase.firestore.collection("events")
 
         eventsColl
-                .whereGreaterThanOrEqualTo("endDateTime",FirebaseDataObjects.toTimestamp(firstDate))
+                .whereGreaterThanOrEqualTo("endDateTime", FirebaseDataObjects.toTimestamp(firstDate))
                 //Replace listOf<String><() with a list of the uuid of all memebers within the group.
                 //.whereArrayContainsAny("participants", listOf<String>())
                 .get().addOnSuccessListener { result ->
@@ -216,8 +258,8 @@ class GroupCalendar : AppCompatActivity()
         paint.strokeWidth = 3F
         for(i in 1..24)
         {
-            day1Canvas.drawLine(0.toFloat(), (i*scalar - scalar/2).toFloat(), day1ImageView.width.toFloat(), (i*scalar - scalar/2).toFloat(), paint)
-            day2Canvas.drawLine(0.toFloat(), (i*scalar - scalar/2).toFloat(), day2ImageView.width.toFloat(), (i*scalar - scalar/2).toFloat(), paint)
+            day1Canvas.drawLine(0.toFloat(), (i * scalar - scalar / 2).toFloat(), day1ImageView.width.toFloat(), (i * scalar - scalar / 2).toFloat(), paint)
+            day2Canvas.drawLine(0.toFloat(), (i * scalar - scalar / 2).toFloat(), day2ImageView.width.toFloat(), (i * scalar - scalar / 2).toFloat(), paint)
         }
     }
 
@@ -242,9 +284,6 @@ class GroupCalendar : AppCompatActivity()
         //now we want to parse the events such that it properly can draw rectangles
         parseAndDrawEvents()
 
-
-        //drawRegion(true, 5f, 8.9f, groupAvailibilityColour(50, 3))
-        //drawRegion(false, 7.6f, 10.4f, groupAvailibilityColour(50, 16))
         drawHourLines()
 
     }
@@ -348,7 +387,7 @@ class GroupCalendar : AppCompatActivity()
                     gCounter++
                 else
                     numberBusy++
-                drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i+1].hour, parsedEventsLeftDay[i+1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
+                drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i + 1].hour, parsedEventsLeftDay[i + 1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
             }
             // else it is an end time
             else
@@ -358,7 +397,7 @@ class GroupCalendar : AppCompatActivity()
                 else
                     numberBusy--
                 if(numberBusy > 0)
-                    drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i+1].hour, parsedEventsLeftDay[i+1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
+                    drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i + 1].hour, parsedEventsLeftDay[i + 1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
             }
             i++
         }
@@ -375,7 +414,7 @@ class GroupCalendar : AppCompatActivity()
                     gCounter++
                 else
                     numberBusy++
-                drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i+1].hour, parsedEventsRightDay[i+1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
+                drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i + 1].hour, parsedEventsRightDay[i + 1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
             }
             // else it is an end time
             else
@@ -385,14 +424,14 @@ class GroupCalendar : AppCompatActivity()
                 else
                     numberBusy--
                 if(numberBusy > 0)
-                    drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i+1].hour, parsedEventsRightDay[i+1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
+                    drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i + 1].hour, parsedEventsRightDay[i + 1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
             }
             i++
         }
     }
 
     // Draws a single region on either day1 column or day 2 column
-    private fun drawRegion(isFirstDay : Boolean, startTime : Float, endTime : Float, colour : String )
+    private fun drawRegion(isFirstDay: Boolean, startTime: Float, endTime: Float, colour: String)
     {
         var region = ShapeDrawable(RectShape())
 
@@ -416,18 +455,12 @@ class GroupCalendar : AppCompatActivity()
                 region.draw(day2Canvas)
             }
         }
-
-        //region2.setBounds(day1ImageView.width, 180*2, day2ImageView.width, 180*3)
-       // region2.paint.color = Color.parseColor("#009944")
-       // region2.draw(canvas)
-
-        // this is a temp location for the call
     }
 
     // takes the number of users in a group and the number of those users that are busy
     // and calculates a shade of grey to represent overall group availibility
     // darker grey for more avalible, lighter for less
-    private fun groupAvailibilityColour(numberBusy : Int, hasGroupEventAtThisTime : Boolean) : String
+    private fun groupAvailibilityColour(numberBusy: Int, hasGroupEventAtThisTime: Boolean) : String
     {
         var busyPercentage = 0f
         if (numberBusy > 0)
@@ -459,23 +492,80 @@ class GroupCalendar : AppCompatActivity()
         }
     }
 
-    private fun timeToFloat(hour : Int, minute : Int) : Float
+    private fun timeToFloat(hour: Int, minute: Int) : Float
     {
         return hour.toFloat() + (minute.toFloat() / 60f)
     }
 
-    private fun swipe(isLeftSwipe : Boolean)
+    private fun swipe(isLeftSwipe: Boolean)
     {
-        Toast.makeText(this,"swiped", Toast.LENGTH_SHORT).show()
         if(isLeftSwipe)
             displayedLeftDay = displayedLeftDay.plusDays(2)
         else
             displayedLeftDay = displayedLeftDay.plusDays(-2)
 
-        leftDay.text = "${displayedLeftDay.month}   ${displayedLeftDay.dayOfMonth}"
-        rightDay.text = "${displayedLeftDay.plusDays(1).month.toString()}   ${displayedLeftDay.plusDays(1).dayOfMonth}"
+        if(showingTwoDayFragment)
+            (supportFragmentManager.findFragmentByTag("TOP_FRAG") as TwoDayViewFragment).setDisplayedDays(displayedLeftDay)
+
         getEvents(LocalDateTime.now())//This should be changed to whatever the leftmost displayed day is. Or maybe that minus 1
         loadColumns()
+    }
+
+    // An internal method that will be called by fragments of this activity
+    // it creates the pop ups for selecting dates and times
+    internal fun makeTimePopUp(startTimePicker : Boolean)
+    {
+        this.startTimePicker = startTimePicker
+
+        val now: LocalDate = LocalDate.now()
+        //give the info to the dialog constructor as well as a reference to our version of its onDateSet
+        val dpd = DatePickerDialog(this, this, now.year, now.monthValue-1 , now.dayOfMonth)//now.monthValue-1
+        dpd.datePicker.minDate = Calendar.getInstance().timeInMillis //Later on we can change this so that if this is the end time it sets the min to be the start time and date
+        dpd.show()
+        // show the dialog pop up
+    }
+
+    // overridden member of the datePickerDialog class
+    // we set it to also make a timePickerDialog
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int)
+    {
+        val now: LocalTime = LocalTime.now()
+        eventDate = LocalDateTime.of(year, month+1,dayOfMonth,0,0)//dayOfMonth+1
+
+        // create a timePicker Dialog
+        val tpd = TimePickerDialog(this,this, now.hour, now.minute, false)
+        tpd.show()
+    }
+
+    // overridden member of the datePickerDialog class
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int)
+    {
+        eventDate = eventDate.plusHours(hourOfDay.toLong()).plusMinutes(minute.toLong())
+
+        //now we also need to send the proper info back to the fragment
+        setFragmentEventEditorEditTexts()
+    }
+
+    // this function will bundle up the info to do with user selected time and date for events
+    // and sends it into the FragmentEventEditor
+    private fun setFragmentEventEditorEditTexts()
+    {
+        (supportFragmentManager.findFragmentByTag("TOP_FRAG") as FragmentEventEditor).setEdits(startTimePicker, eventDate)
+    }
+
+    internal fun submitNewEvent(event:FirebaseDataObjects.Event) // ***********************************************  Viktor can you make sure the code here will work
+    {
+        Toast.makeText(this, "We called it boys", Toast.LENGTH_SHORT).show() // you can get rid of this lol
+        /*
+        val db = Firebase.firestore
+
+        db.collection("events").document().set(event).addOnSuccessListener { documentReference ->
+            Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
+        }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+            }
+        */
     }
 
 

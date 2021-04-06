@@ -9,17 +9,18 @@
     app:layout_constraintLeft_toLeftOf="parent"
     app:layout_constraintRight_toRightOf="parent"
     app:layout_constraintTop_toTopOf="parent" -->
+    <!-- android:layout_height="30dp"-->
 
-    <LinearLayout
+   <!-- <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:id="@+id/dayBar"
+        android:layout_height="wrap_content"
+        android:id="@+id/topFrame"
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="horizontal"
         android:weightSum="12">
         <View
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="30dp"
             android:layout_weight="2"/>
         <TextView
             android:layout_width="0dp"
@@ -36,7 +37,14 @@
             android:text= "day 2"
             android:id="@+id/day2Date"
             android:textAlignment="center"/>
-    </LinearLayout>
+    </LinearLayout>-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/topFrame"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal">
+    </FrameLayout>
 
 
 
@@ -44,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/scrollView"
-        app:layout_constraintTop_toBottomOf="@id/dayBar"
+        app:layout_constraintTop_toBottomOf="@id/topFrame"
         >
     <LinearLayout
         android:layout_width="match_parent"
