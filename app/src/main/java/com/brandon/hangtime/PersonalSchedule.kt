@@ -128,7 +128,7 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         eventDate = LocalDateTime.of(year, month+1,dayOfMonth,0,0)//dayOfMonth+1
 
         // create a timePicker Dialog
-        var tpd = TimePickerDialog(this,this, now.hour, now.minute, false)
+        val tpd = TimePickerDialog(this,this, now.hour, now.minute, false)
         tpd.show()
     }
 

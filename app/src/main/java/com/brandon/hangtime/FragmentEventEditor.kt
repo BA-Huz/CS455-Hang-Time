@@ -19,8 +19,8 @@ class FragmentEventEditor : Fragment()
 {
     // when the user clicks on either edit text it will actually open pop up windows
     // the edit text is used because it affords clicking
-    private lateinit var startTimeWidget : EditText
-    private lateinit var endTimeWidget: EditText
+    private lateinit var startTimeWidget : TextView
+    private lateinit var endTimeWidget: TextView
     private lateinit var eventNameWidget : EditText
     private lateinit var eventDescriptionWidget : EditText
     //private lateinit var repetitiveRadioGroup : RadioGroup
@@ -134,6 +134,7 @@ class FragmentEventEditor : Fragment()
         if(startTimeEdit)
         {
             startTimeWidget.setText("${eventTime.month.toString()}  ${eventTime.dayOfMonth}  at  $h:$m $M")
+            startDate = eventTime
         }
         else
         {

@@ -47,7 +47,8 @@ object FirebaseDataObjects {
     data class EventTimeComponent(
             val hour : Int,
             val minute : Int,
-            val isStart : Boolean
+            val isStart : Boolean,
+            val isGroupEvent : Boolean
     )
 
 

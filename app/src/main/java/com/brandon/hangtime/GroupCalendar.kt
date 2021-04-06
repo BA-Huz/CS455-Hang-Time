@@ -26,6 +26,8 @@ import java.time.Month
 
 class GroupCalendar : AppCompatActivity()
 {
+    private var thisGroupId : String? = ""
+
     // scalar is used to line up the event regions with the hours
     // each hour is 60dp apart in xml and in  kotlin code 180 apart
     private var scalar = 0
@@ -74,6 +76,8 @@ class GroupCalendar : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_calendar)
+
+        thisGroupId = intent.getStringExtra("group")
 
         setLateInits()
         setListeners()
@@ -259,24 +263,25 @@ class GroupCalendar : AppCompatActivity()
             // put start time in left day
             if(start.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true)
+
+                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == thisGroupId))
                 parsedEventsLeftDay.add(toAdd)
                 // if it ends after left day
                 if (end.dayOfMonth > displayedLeftDay.dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false)
+                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == thisGroupId))
                     parsedEventsLeftDay.add(toAdd)
                 }
             }
             // put start time in right day
             else if(start.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true)
+                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == thisGroupId))
                 parsedEventsRightDay.add(toAdd)
                 // if it ends after right day
                 if (end.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false)
+                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == thisGroupId))
                     parsedEventsRightDay.add(toAdd)
                 }
             }
@@ -284,24 +289,24 @@ class GroupCalendar : AppCompatActivity()
             // put end time in left day
             if(end.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false)
+                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == thisGroupId))
                 parsedEventsLeftDay.add(toAdd)
                 // if it starts before left day
                 if (start.dayOfMonth < displayedLeftDay.dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true)
+                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == thisGroupId))
                     parsedEventsLeftDay.add(toAdd)
                 }
             }
             // put end time in right day
             else if(end.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false)
+                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == thisGroupId))
                 parsedEventsRightDay.add(toAdd)
                 // if it starts before right day
                 if (start.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true)
+                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == thisGroupId))
                     parsedEventsRightDay.add(toAdd)
                 }
             }
@@ -309,18 +314,18 @@ class GroupCalendar : AppCompatActivity()
             //if an event starts before and ends after the left day
             if(start.dayOfMonth < displayedLeftDay.dayOfMonth && end.dayOfMonth > displayedLeftDay.dayOfMonth)
             {
-                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true)
+                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == thisGroupId))
                 parsedEventsLeftDay.add(toAdd)
-                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false)
+                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == thisGroupId))
                 parsedEventsLeftDay.add(toAdd)
             }
 
             //if an event starts before and ends after the right day
             if(start.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth && end.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true)
+                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == thisGroupId))
                 parsedEventsRightDay.add(toAdd)
-                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false)
+                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == thisGroupId))
                 parsedEventsRightDay.add(toAdd)
             }
 
@@ -333,20 +338,27 @@ class GroupCalendar : AppCompatActivity()
 
         var numberBusy = 0
         var i = 0
+        var gCounter = 0
         while (i < parsedEventsLeftDay.size)
         {
             // if it is a start time
             if (parsedEventsLeftDay[i].isStart)
             {
-                numberBusy++
-                drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i+1].hour, parsedEventsLeftDay[i+1].minute), groupAvailibilityColour(numberBusy))
+                if(parsedEventsLeftDay[i].isGroupEvent)
+                    gCounter++
+                else
+                    numberBusy++
+                drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i+1].hour, parsedEventsLeftDay[i+1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
             }
             // else it is an end time
             else
             {
-                numberBusy--
+                if(parsedEventsLeftDay[i].isGroupEvent)
+                    gCounter--
+                else
+                    numberBusy--
                 if(numberBusy > 0)
-                    drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i+1].hour, parsedEventsLeftDay[i+1].minute), groupAvailibilityColour(numberBusy))
+                    drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i+1].hour, parsedEventsLeftDay[i+1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
             }
             i++
         }
@@ -359,15 +371,21 @@ class GroupCalendar : AppCompatActivity()
             // if it is a start time
             if (parsedEventsRightDay[i].isStart)
             {
-                numberBusy++
-                drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i+1].hour, parsedEventsRightDay[i+1].minute), groupAvailibilityColour(numberBusy))
+                if(parsedEventsRightDay[i].isGroupEvent)
+                    gCounter++
+                else
+                    numberBusy++
+                drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i+1].hour, parsedEventsRightDay[i+1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
             }
             // else it is an end time
             else
             {
-                numberBusy--
+                if(parsedEventsRightDay[i].isGroupEvent)
+                    gCounter--
+                else
+                    numberBusy--
                 if(numberBusy > 0)
-                    drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i+1].hour, parsedEventsRightDay[i+1].minute), groupAvailibilityColour(numberBusy))
+                    drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i+1].hour, parsedEventsRightDay[i+1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
             }
             i++
         }
@@ -409,7 +427,7 @@ class GroupCalendar : AppCompatActivity()
     // takes the number of users in a group and the number of those users that are busy
     // and calculates a shade of grey to represent overall group availibility
     // darker grey for more avalible, lighter for less
-    private fun groupAvailibilityColour(numberBusy : Int) : String
+    private fun groupAvailibilityColour(numberBusy : Int, hasGroupEventAtThisTime : Boolean) : String
     {
         var busyPercentage = 0f
         if (numberBusy > 0)
@@ -417,14 +435,28 @@ class GroupCalendar : AppCompatActivity()
         else
             busyPercentage = numberBusy.toFloat()/numberInGroup.toFloat() * -1
 
-        if(busyPercentage > 0.5f)
-            return "#463E3F" // black eel
-        else if(busyPercentage > 0.25f)
-            return "#666362" // ash grey
-        else if(busyPercentage >= 0.1f)
-            return "#B6B6B4" // grey cloud
+        if(! hasGroupEventAtThisTime)
+        {
+            if (busyPercentage > 0.5f)
+                return "#463E3F" // black eel
+            else if (busyPercentage > 0.25f)
+                return "#666362" // ash grey
+            else if (busyPercentage >= 0.1f)
+                return "#B6B6B4" // grey cloud
+            else
+                return "#E5E4E2" // platinum
+        }
         else
-            return "#E5E4E2" // platinum
+        {
+            if (busyPercentage > 0.5f)
+                return "#000066"
+            else if (busyPercentage > 0.25f)
+                return "#000099" // Lapis Blue
+            else if (busyPercentage >= 0.1f)
+                return "#0000b3" // grey cloud
+            else
+                return "#0000cc" // platinum
+        }
     }
 
     private fun timeToFloat(hour : Int, minute : Int) : Float
