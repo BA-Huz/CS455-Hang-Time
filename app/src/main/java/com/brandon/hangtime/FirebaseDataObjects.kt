@@ -36,7 +36,8 @@ object FirebaseDataObjects {
     data class Group(
             val groupName: String = "",
             val members: List<String>? = null,
-            val owner: String = ""
+            val owner: String = "",
+            val id: String = ""
     ) : Serializable {
         override fun toString():String = groupName
     }

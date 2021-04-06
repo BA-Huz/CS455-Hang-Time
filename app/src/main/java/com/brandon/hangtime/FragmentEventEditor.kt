@@ -1,5 +1,6 @@
 package com.brandon.hangtime
 
+import android.app.Activity
 import android.os.Bundle
 import android.text.InputType
 import android.text.format.Time
@@ -38,9 +39,11 @@ class FragmentEventEditor : Fragment()
     private var myParent : Parent = Parent.GROUPCALENDAR
 
 
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         val v = inflater.inflate(R.layout.fragment_event_editor, container, false)
+
 
         setLateInits(v)
         setListeners()
@@ -111,8 +114,8 @@ class FragmentEventEditor : Fragment()
                             FirebaseDataObjects.toTimestamp(startDate),
                             FirebaseDataObjects.toTimestamp(endDate),
                             Firebase.auth.currentUser.uid,
-                            ""//eventDescriptionWidget.text.toString()
-
+                            "", //eventDescriptionWidget.text.toString()
+                            null
                     )
                     if(myParent == Parent.PERSONALSCHEDULE)
                         (activity as PersonalSchedule).submitNewEvent(event)

@@ -31,7 +31,7 @@ import java.util.*
 
 class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener
 {
-    private var thisGroupId : String? = ""
+    private lateinit var currentGroup : FirebaseDataObjects.Group
 
     // this variable will tell us if we are creating an event start time or end time
     private var startTimePicker = true
@@ -93,7 +93,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_calendar)
 
-        thisGroupId = intent.getStringExtra("group")
+        currentGroup = intent.getSerializableExtra("group") as FirebaseDataObjects.Group
 
         setLateInits()
 
@@ -240,7 +240,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         day2ImageView.background = BitmapDrawable(resources, day2BitMap)
     }
 
-    //draws lines to coraspond with each hour
+    //draws lines to corespond with each hour
     private fun drawHourLines()
     {
         val paint = Paint()
@@ -303,24 +303,24 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
             if(start.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
 
-                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == thisGroupId))
+                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == currentGroup.id))
                 parsedEventsLeftDay.add(toAdd)
                 // if it ends after left day
                 if (end.dayOfMonth > displayedLeftDay.dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == thisGroupId))
+                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id))
                     parsedEventsLeftDay.add(toAdd)
                 }
             }
             // put start time in right day
             else if(start.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == thisGroupId))
+                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == currentGroup.id))
                 parsedEventsRightDay.add(toAdd)
                 // if it ends after right day
                 if (end.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == thisGroupId))
+                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id))
                     parsedEventsRightDay.add(toAdd)
                 }
             }
@@ -328,24 +328,24 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
             // put end time in left day
             if(end.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == thisGroupId))
+                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == currentGroup.id))
                 parsedEventsLeftDay.add(toAdd)
                 // if it starts before left day
                 if (start.dayOfMonth < displayedLeftDay.dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == thisGroupId))
+                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id))
                     parsedEventsLeftDay.add(toAdd)
                 }
             }
             // put end time in right day
             else if(end.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == thisGroupId))
+                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == currentGroup.id))
                 parsedEventsRightDay.add(toAdd)
                 // if it starts before right day
                 if (start.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == thisGroupId))
+                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id))
                     parsedEventsRightDay.add(toAdd)
                 }
             }
@@ -353,18 +353,18 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
             //if an event starts before and ends after the left day
             if(start.dayOfMonth < displayedLeftDay.dayOfMonth && end.dayOfMonth > displayedLeftDay.dayOfMonth)
             {
-                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == thisGroupId))
+                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id))
                 parsedEventsLeftDay.add(toAdd)
-                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == thisGroupId))
+                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id))
                 parsedEventsLeftDay.add(toAdd)
             }
 
             //if an event starts before and ends after the right day
             if(start.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth && end.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == thisGroupId))
+                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id))
                 parsedEventsRightDay.add(toAdd)
-                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == thisGroupId))
+                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id))
                 parsedEventsRightDay.add(toAdd)
             }
 
@@ -555,17 +555,19 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
     internal fun submitNewEvent(event:FirebaseDataObjects.Event) // ***********************************************  Viktor can you make sure the code here will work
     {
-        Toast.makeText(this, "We called it boys", Toast.LENGTH_SHORT).show() // you can get rid of this lol
-        /*
+        //Toast.makeText(this, "We called it boys", Toast.LENGTH_SHORT).show() // you can get rid of this lol
+
         val db = Firebase.firestore
 
-        db.collection("events").document().set(event).addOnSuccessListener { documentReference ->
+        val eventId = event.copy(group = currentGroup.id)
+
+        db.collection("events").document().set(eventId).addOnSuccessListener { documentReference ->
             Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
         }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
             }
-        */
+
     }
 
 

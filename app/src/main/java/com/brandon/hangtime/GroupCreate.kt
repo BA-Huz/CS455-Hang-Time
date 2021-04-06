@@ -3,19 +3,13 @@ package com.brandon.hangtime;
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.QueryDocumentSnapshot
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
-import org.w3c.dom.Text
-import java.util.ArrayList
 
 public class GroupCreate : AppCompatActivity() {
 
@@ -109,15 +103,15 @@ public class GroupCreate : AppCompatActivity() {
 
          private fun addGroup(name: String, members: List<FirebaseDataObjects.User>){
                  val db = Firebase.firestore
-
+                 val id = db.collection("groups").document().id
                  val group:FirebaseDataObjects.Group = FirebaseDataObjects.Group(
-                        name,
-                        members.map{ it.UUID},
-                        Firebase.auth.currentUser.uid
+                         name,
+                         members.map{ it.UUID},
+                         Firebase.auth.currentUser.uid,
+                         id
                  )
 
-
-                 db.collection("groups").document().set(group).addOnSuccessListener { documentReference ->
+                 db.collection("groups").document(id).set(group).addOnSuccessListener { documentReference ->
                          Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
 
 
