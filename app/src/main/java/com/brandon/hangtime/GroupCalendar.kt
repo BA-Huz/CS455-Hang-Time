@@ -1,5 +1,6 @@
 package com.brandon.hangtime
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.Bitmap
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.text.DateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -56,13 +58,21 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // when the first page loads it is set to the current day
     internal var displayedLeftDay = LocalDateTime.now()
 
+    // hold flags are for holding a touch on event regions
+    // they help to handle some minor threading
+    // holdFlag1 stops a thread from being multi instantiated
+    // holdFlag2 is used to test if the user has lifted their finger
+    // while the thread sleeps
+    private var holdFlag1 = false
+    private var holdFlag2 = false
+
+    // these values are used with the scrollview on touch Listener
     private var touchDownX = -1f
     private var touchUpX = -1f
     private var touchDownY = -1f
     private var touchUpY = -1f
     private var lastMove = 0
     private var nowMove = 0
-
 
     // these 2 bitmaps and canvases will be used to draw rectangles
     // they also cannot be initialized fully until after completion of onCreate()
@@ -75,17 +85,16 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     private lateinit var day2Canvas : Canvas
     private var createdBitMapsAndCanvases = false
 
+    // widgets not attached to a fragment
     private lateinit var scrollView : ScrollView
     private lateinit var day1ImageView : ImageView
     private lateinit var day2ImageView : ImageView
-
     private lateinit var eventButton : Button
 
-    private lateinit var twoDayViewFragment: TwoDayViewFragment
+    // the two fragments used by this activity and a bool to represent which is active
+    private lateinit var twoDayViewFragment : TwoDayViewFragment
     private lateinit var eventEditorFragment : FragmentEventEditor
     private var showingTwoDayFragment = true
-
-    //private lateinit var loadColsJob : Job
 
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -104,16 +113,8 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
         setListeners()
 
+        // grabs the events from the db
         getEvents(LocalDate.now().atStartOfDay())
-
-        // We cannot draw on the screen until after onCreate has finished
-        // and we also cannot touch the view from a thread that did not create
-        // the view. So to solve this we start a new coroutine  that waits half a second
-        // and then orders the main routine to execute the function chain that does the drawing
-        GlobalScope.launch{
-            Thread.sleep(500)
-            Handler(Looper.getMainLooper()).post(Runnable { loadColumns() })
-        }
     }
 
 
@@ -124,12 +125,11 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         day1ImageView = findViewById(R.id.groupCalendarDay1)
         day2ImageView = findViewById(R.id.groupCalendarDay2)
 
-
-
         eventButton = findViewById(R.id.GroupEventButton)
 
         twoDayViewFragment = TwoDayViewFragment()
         eventEditorFragment = FragmentEventEditor()
+
     }
 
     private fun setListeners()
@@ -160,10 +160,35 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
             detectedTouch(m)
             true
         }
+
+
     }
 
+    // our implementation of the scrollview's on touch listener
+    // calls this function
     private fun detectedTouch(m: MotionEvent)
     {
+        // this first snippet works to test if the user is holding a touch on an event region
+        // hold flag 1 stops the thread from multi instantiating itself
+        // hold flag 2 stops the toast from happening if the user lifted their finger up during the threads sleep
+        if(holdFlag1 == false && holdFlag2 == false)
+        {
+            holdFlag1 = true
+            holdFlag2 = true
+            GlobalScope.launch{
+                Thread.sleep(500)
+                if(holdFlag2 == true) // if we were holding this whole time
+                {
+                    if(m.x >= day1ImageView.left && m.x <= day1ImageView.right)
+                        Handler(Looper.getMainLooper()).post(Runnable { toastBusyMembersAtTime(clickPostionToTime(m.y, true)) })
+                    else if(m.x >= day2ImageView.left && m.x <= day2ImageView.right)
+                        Handler(Looper.getMainLooper()).post(Runnable { toastBusyMembersAtTime(clickPostionToTime(m.y, false)) })
+                }
+                holdFlag1 = false
+            }
+        }
+
+        // if this was a move action then scroll the scrollview
         if(m.action == MotionEvent.ACTION_MOVE)
         {
             lastMove = nowMove
@@ -175,6 +200,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                 scrollView.scrollY -= difference
             }
         }
+        // else if this was an action down then store values
         else if(m.action == MotionEvent.ACTION_DOWN)
         {
             touchDownX = m.x
@@ -184,8 +210,10 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
             lastMove = 0
             nowMove = 0
         }
+        // else if this was an action up then see if the values of the down and up validate a swipe
         else if(m.action == MotionEvent.ACTION_UP)
         {
+            holdFlag2 = false;
             lastMove = 0
             nowMove = 0
             touchUpX = m.x
@@ -200,6 +228,39 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                 // swipe left
                 swipe(true)
             }
+        }
+
+    }
+
+    // makes a toast listing all the members that are busy with events at the time given
+    private fun toastBusyMembersAtTime(clickedTime : LocalDateTime)
+    {
+        // build an array of the names of members busy
+        var busyMembers = arrayOf<String>()
+        if(events != null) {
+            for (e in events) {
+                val start = toLocalDateTime(e.startDateTime!!)
+                val end = toLocalDateTime(e.endDateTime!!)
+                if ((clickedTime < end && clickedTime > start)) // if the clicked time exists within an event
+                {
+                    if ( e.group == null) //and that event is not a group event
+                        busyMembers = busyMembers.plus("${getIDsName(e.owner)}")
+                    else if (e.group != currentGroup.id) // else and this is a group event of another group
+                        busyMembers = addOverlappingGroupMembers(busyMembers, e)
+                }
+            }
+
+            // put those names in a string then Toast those names
+            busyMembers = deleteRepeats(busyMembers)
+            var message = ""
+            for (m in busyMembers) {
+                if (message == "")
+                    message += "$m"
+                else
+                    message += ", $m"
+            }
+            if (message != "")
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -218,6 +279,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                     }
                 //Successful retrieval listener code goes here
                     Log.d(TAG, events.toString())
+                loadColumns()
         }
          .addOnFailureListener { exception ->
              Log.d(TAG, "Error getting documents: ", exception)
@@ -288,12 +350,14 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
     }
 
+    // this function takes the list of events and extracts the start and end times of each
+    // it then sorts theses times for drawing rectangles we called regions
     private fun parseAndDrawEvents()
     {
         var parsedEventsLeftDay = mutableListOf<FirebaseDataObjects.EventTimeComponent>()
         var parsedEventsRightDay = mutableListOf<FirebaseDataObjects.EventTimeComponent>()
 
-        // put nessicary info into the left and right days
+        // put necessary info into the left and right days
         for(e in events)
         {
             val start = toLocalDateTime(e.startDateTime!!)
@@ -375,6 +439,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         parsedEventsLeftDay.sortBy{it.hour * 100 + it.minute}
         parsedEventsRightDay.sortBy{it.hour * 100 + it.minute}
 
+    // draw the regions between each time in the lists
         var numberBusy = 0
         var i = 0
         var gCounter = 0
@@ -460,6 +525,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // takes the number of users in a group and the number of those users that are busy
     // and calculates a shade of grey to represent overall group availibility
     // darker grey for more avalible, lighter for less
+    // blue for this groups events, darker blue if this groups event that members are already busy for
     private fun groupAvailibilityColour(numberBusy: Int, hasGroupEventAtThisTime: Boolean) : String
     {
         var busyPercentage = 0f
@@ -492,11 +558,13 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         }
     }
 
+    // converts an hour and minute into a single float
     private fun timeToFloat(hour: Int, minute: Int) : Float
     {
         return hour.toFloat() + (minute.toFloat() / 60f)
     }
 
+    // changes the displayed days to adjacent days depending on swipe direction
     private fun swipe(isLeftSwipe: Boolean)
     {
         if(isLeftSwipe)
@@ -507,7 +575,8 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         if(showingTwoDayFragment)
             (supportFragmentManager.findFragmentByTag("TOP_FRAG") as TwoDayViewFragment).setDisplayedDays(displayedLeftDay)
 
-        getEvents(LocalDateTime.now())//This should be changed to whatever the leftmost displayed day is. Or maybe that minus 1
+        // get the events for the next day
+        getEvents(LocalDate.now().atStartOfDay())
         loadColumns()
     }
 
@@ -553,10 +622,9 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         (supportFragmentManager.findFragmentByTag("TOP_FRAG") as FragmentEventEditor).setEdits(startTimePicker, eventDate)
     }
 
-    internal fun submitNewEvent(event:FirebaseDataObjects.Event) // ***********************************************  Viktor can you make sure the code here will work
+    // submits a group event into the db
+    internal fun submitNewEvent(event:FirebaseDataObjects.Event)
     {
-        //Toast.makeText(this, "We called it boys", Toast.LENGTH_SHORT).show() // you can get rid of this lol
-
         val db = Firebase.firestore
 
         val eventId = event.copy(group = currentGroup.id)
@@ -570,6 +638,46 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
     }
 
+    // determines the date time associated with the location on the scrollview that the user clicked on
+    private fun clickPostionToTime(y : Float, isLeftDay : Boolean) : LocalDateTime
+    {
+        val time = (y - scalar.toFloat())/scalar.toFloat() + scrollView.scrollY/scalar.toFloat()
+        val hour = time - (time % 1) - 1
+        var minute = ((time % 1)/1.67f)
+        minute -= (minute % 0.01f)
+        minute *= 100
+
+        if(isLeftDay)
+            return LocalDateTime.of(displayedLeftDay.year, displayedLeftDay.month, displayedLeftDay.dayOfMonth, hour.toInt(), minute.toInt())
+        else
+            return LocalDateTime.of(displayedLeftDay.plusDays(1).year, displayedLeftDay.plusDays(1).month, displayedLeftDay.plusDays(1).dayOfMonth, hour.toInt(), minute.toInt())
+    }
+
+    // deletes any duplicate strings in an array
+    private fun deleteRepeats(strings : Array<String>) : Array<String>
+    {
+        return listOf(*strings).toSet().toTypedArray()
+    }
+
+    // returns the username of the corresponding ownerID
+    private fun getIDsName(ownerId : String) : String
+    {
+        return "Alex" // ******************************************** Viktor make this work
+    }
+
+    // takes an event of a different group and adds the members names who are in that group and this group
+    private fun addOverlappingGroupMembers(busyMembers : Array<String>, event : FirebaseDataObjects.Event) : Array<String>
+    {
+        var addedArray = busyMembers    // ***************************************** Viktor make this work
+
+        if (event.participants != null && currentGroup.members != null)
+            for(p in event.participants)
+                for(m in currentGroup.members!!)
+                    if(p == m)
+                        addedArray = addedArray.plus(getIDsName(p))
+
+        return deleteRepeats(addedArray)
+    }
 
     companion object {
         private const val TAG = "GroupCalendar"
