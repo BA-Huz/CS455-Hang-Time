@@ -660,9 +660,12 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     }
 
     // returns the username of the corresponding ownerID
-    private fun getIDsName(ownerId : String) : String
+    private fun getIDsName(ownerId : String)
     {
-        return "Alex" // ******************************************** Viktor make this work
+        FirebaseDataObjects.getUsers(ownerId){ user ->
+            //This is a callback function, so the code for what needs to happen with the name has to go here, else it will block.
+            user.first().name
+        }
     }
 
     // takes an event of a different group and adds the members names who are in that group and this group

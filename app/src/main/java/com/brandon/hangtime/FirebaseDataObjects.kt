@@ -1,10 +1,15 @@
 package com.brandon.hangtime
 
+import android.util.Log
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
 import java.io.Serializable
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import javax.security.auth.callback.Callback
 
 
 object FirebaseDataObjects {
@@ -59,6 +64,24 @@ object FirebaseDataObjects {
 
     fun toLocalDateTime(ts:Timestamp):LocalDateTime{
         return LocalDateTime.ofInstant(ts.toDate().toInstant(), ZoneId.systemDefault())
+    }
+
+
+    fun getUsers(userId:String, callback: (List<User>) -> Unit){
+        getUsers(listOf(userId)){ user -> callback(user)}
+    }
+
+    fun getUsers(userId:List<String>, callback: (List<User>) -> Unit){
+
+        if (userId.isEmpty()) callback(listOf())
+
+        val db = Firebase.firestore.collection("users")
+        db.whereIn("UUID", userId).get().addOnSuccessListener { result ->
+            val users = result!!.map { snapshot ->
+                snapshot.toObject<User>()
+            }
+            callback(users)
+        }
     }
 
 
