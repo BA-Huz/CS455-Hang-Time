@@ -5,24 +5,28 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.activity_group_create.*
 
 public class GroupCreate : AppCompatActivity() {
 
         private lateinit var saveButton: Button
         private lateinit var cancelButton: Button
         private lateinit var groupName: EditText
-        private lateinit var userSelect: AutoCompleteTextView
-        private lateinit var groupMembers: TextView
         private lateinit var errorTextView: TextView
 
         override fun onCreate(savedInstanceState: Bundle?)
         {
                 super.onCreate(savedInstanceState)
+                supportFragmentManager.beginTransaction()
+                        .setReorderingAllowed(true)
+                        .add( R.id.user_select_fragment,UserSelectFragment())
+                        .commit()
+
                 setContentView(R.layout.activity_group_create)
 
 
@@ -34,30 +38,17 @@ public class GroupCreate : AppCompatActivity() {
 
         }
 
-        var uuid:List<FirebaseDataObjects.User> = listOf()
 
         private fun setAutoComplete(){
-                val users = Firebase.firestore.collection("users")
-
-                var names:List<FirebaseDataObjects.User> = listOf()
+                val usersDB = Firebase.firestore.collection("users")
 
 
-                users.get().addOnSuccessListener {  result ->
-                        names = result!!.map { snapshot ->
+                usersDB.get().addOnSuccessListener {  result ->
+                        val users = result!!.map { snapshot ->
                         snapshot.toObject<FirebaseDataObjects.User>()
                         }
+                        UserSelectFragment().setAutoCompleteSource(users)
 
-                        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, names)
-                        userSelect.setAdapter(adapter)
-
-                        userSelect.onItemClickListener = AdapterView.OnItemClickListener{
-                                parent,view,position,id->
-                                val selectedItem: FirebaseDataObjects.User = parent.getItemAtPosition(position) as FirebaseDataObjects.User
-
-                                groupMembers.text = selectedItem.toString() + "\n"
-                                uuid += selectedItem
-
-                        }
                 }
                 .addOnFailureListener { exception ->
                         Log.d(TAG, "Error getting documents: ", exception)
@@ -70,8 +61,6 @@ public class GroupCreate : AppCompatActivity() {
                 saveButton = findViewById(R.id.createGroupButton)
                 cancelButton = findViewById(R.id.cancelButton)
                 groupName = findViewById(R.id.groupName)
-                userSelect = findViewById(R.id.userSelectText)
-                groupMembers = findViewById(R.id.usersInGroupText)
                 errorTextView = findViewById(R.id.error)
         }
 
@@ -86,7 +75,7 @@ public class GroupCreate : AppCompatActivity() {
                         }
                         else
                         {
-                                addGroup(groupName.text.toString(), uuid)
+                                addGroup(groupName.text.toString())
                                 val intent = Intent(this, GroupList::class.java)
                                 startActivity(intent)
 
@@ -101,12 +90,12 @@ public class GroupCreate : AppCompatActivity() {
 
 
 
-         private fun addGroup(name: String, members: List<FirebaseDataObjects.User>){
+         private fun addGroup(name: String){
                  val db = Firebase.firestore
                  val id = db.collection("groups").document().id
                  val group:FirebaseDataObjects.Group = FirebaseDataObjects.Group(
                          name,
-                         members.map{ it.UUID},
+                         UserSelectFragment().getSelectedUsers().map{it.UUID },
                          Firebase.auth.currentUser.uid,
                          id
                  )

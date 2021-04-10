@@ -677,8 +677,9 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
             for(p in event.participants)
                 for(m in currentGroup.members!!)
                     if(p == m)
-                        addedArray = addedArray.plus(getIDsName(p))
+                        addedArray = addedArray.plus(p)
 
+        FirebaseDataObjects.getUsers(listOf<String>(*addedArray)){ users -> users}
         return deleteRepeats(addedArray)
     }
 

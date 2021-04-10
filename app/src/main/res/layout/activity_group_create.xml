@@ -52,21 +52,6 @@
         android:text="@string/add_users"
         android:textSize="30sp" />
 
-    <AutoCompleteTextView
-        android:id="@+id/userSelectText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:hint="Enter an email"
-        android:completionThreshold="2"
-        android:completionHint="Enter an email" />
-
-    <TextView
-        android:id="@+id/usersInGroupText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -78,6 +63,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout2" />
+
+        <fragment
+            android:id="@+id/user_select_fragment"
+            android:name="com.brandon.hangtime.UserSelectFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/linearLayout2"
@@ -106,6 +100,7 @@
                 android:text="@string/save" />
 
         </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
