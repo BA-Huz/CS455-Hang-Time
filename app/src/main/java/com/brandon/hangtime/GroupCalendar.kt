@@ -631,9 +631,19 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
         db.collection("events").document().set(eventId).addOnSuccessListener { documentReference ->
             Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
+            Toast.makeText(this, "${event.name} has been submitted", Toast.LENGTH_SHORT).show()
+            (supportFragmentManager.findFragmentByTag("TOP_FRAG") as FragmentEventEditor).setSaveButtonClickability(true)
+            eventButton.text = "Schedule a Group Event"
+            supportFragmentManager.beginTransaction().apply{
+                replace(R.id.topFrame, twoDayViewFragment, "TOP_FRAG")
+                commit()
+            }
+            showingTwoDayFragment = true
         }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
+                Toast.makeText(this, "${event.name} was not submitted successfully", Toast.LENGTH_SHORT).show()
+                (supportFragmentManager.findFragmentByTag("TOP_FRAG") as FragmentEventEditor).setSaveButtonClickability(true)
             }
 
     }
@@ -662,10 +672,13 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // returns the username of the corresponding ownerID
     private fun getIDsName(ownerId : String)
     {
+        var s : String?
         FirebaseDataObjects.getUsers(ownerId){ user ->
             //This is a callback function, so the code for what needs to happen with the name has to go here, else it will block.
             user.first().name
+        //    s =
         }
+       // return s
     }
 
     // takes an event of a different group and adds the members names who are in that group and this group
@@ -673,11 +686,11 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     {
         var addedArray = busyMembers    // ***************************************** Viktor make this work
 
-        if (event.participants != null && currentGroup.members != null)
+        /*if (event.participants != null && currentGroup.members != null)
             for(p in event.participants)
                 for(m in currentGroup.members!!)
                     if(p == m)
-                        addedArray = addedArray.plus(getIDsName(p))
+                        addedArray = addedArray.plus(getIDsName(p))*/
 
         return deleteRepeats(addedArray)
     }
