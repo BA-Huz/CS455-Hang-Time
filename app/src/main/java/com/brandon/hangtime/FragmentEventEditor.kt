@@ -104,6 +104,7 @@ class FragmentEventEditor : Fragment()
                     else
                         Toast.makeText(activity as GroupCalendar, "The event must end after it starts", Toast.LENGTH_SHORT).show()
                 } else{
+                    saveButton.isClickable = false // so the button cant be spammed while the database is being accessed
 
                     val event = FirebaseDataObjects.Event(
                             eventNameWidget.text.toString(),
@@ -120,6 +121,11 @@ class FragmentEventEditor : Fragment()
                 }
             }
         }
+    }
+
+    internal fun setSaveButtonClickability(clickable : Boolean)
+    {
+        saveButton.isClickable = clickable
     }
 
     // this function is intended to be called by the personal schedule for when we are inserting

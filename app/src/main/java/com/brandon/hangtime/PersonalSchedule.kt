@@ -5,11 +5,8 @@ import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.FrameLayout
+import android.widget.*
 import java.util.*
-import android.widget.DatePicker
-import android.widget.TimePicker
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
@@ -82,7 +79,7 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             if(isShowingCalendar)
             {
                 supportFragmentManager.beginTransaction().apply {
-                    // set the two FrameLayouts to hold these 2 fragments
+                    // set the top FrameLayout to hold the event editor fragments
                     replace(R.id.personalCalendarTopFragment, eventEditorFragment, "TOP_FRAG_TAG")
                     commit()
                 }
@@ -94,7 +91,7 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             else
             {
                 supportFragmentManager.beginTransaction().apply {
-                    // set the two FrameLayouts to hold these 2 fragments
+                    // set the top FrameLayout to hold the event editor fragments
                     replace(R.id.personalCalendarTopFragment, personalCalendarFragment, "TOP_FRAG_TAG")
                     commit()
                 }
@@ -152,9 +149,20 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         db.collection("events").document().set(event).addOnSuccessListener { documentReference ->
             Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
+            Toast.makeText(this, "${event.name} has been submitted", Toast.LENGTH_SHORT).show()
+            (supportFragmentManager.findFragmentByTag("TOP_FRAG_TAG") as FragmentEventEditor).setSaveButtonClickability(true)
+            supportFragmentManager.beginTransaction().apply {
+                // set the top FrameLayout to hold the event editor fragments
+                replace(R.id.personalCalendarTopFragment, personalCalendarFragment, "TOP_FRAG_TAG")
+                commit()
+            }
+            swapButton.text = "Add Event"
+            isShowingCalendar = true
         }
         .addOnFailureListener { e ->
             Log.w(TAG, "Error adding document", e)
+            Toast.makeText(this, "${event.name} was not submitted successfully", Toast.LENGTH_SHORT).show()
+            (supportFragmentManager.findFragmentByTag("TOP_FRAG_TAG") as FragmentEventEditor).setSaveButtonClickability(true)
         }
 
     }
