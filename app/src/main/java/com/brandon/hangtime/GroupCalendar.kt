@@ -53,6 +53,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // a list of events that we will grab from the db. each event
     // is personal events of group members
     private lateinit var events : List<FirebaseDataObjects.Event>
+    private lateinit var userIdNamePairs : Map<String, String>
 
     // the date of whichever day is displayed in the left column
     // when the first page loads it is set to the current day
@@ -244,7 +245,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                 if ((clickedTime < end && clickedTime > start)) // if the clicked time exists within an event
                 {
                     if ( e.group == null) //and that event is not a group event
-                        busyMembers = busyMembers.plus("${getIDsName(e.owner)}")
+                        busyMembers = busyMembers.plus("${userIdNamePairs.getValue(e.owner)}")
                     else if (e.group != currentGroup.id) // else and this is a group event of another group
                         busyMembers = addOverlappingGroupMembers(busyMembers, e)
                 }
@@ -284,6 +285,10 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
          .addOnFailureListener { exception ->
              Log.d(TAG, "Error getting documents: ", exception)
          }
+
+
+        // the first string is the key which we are using id, the second string is the values which is the name
+        userIdNamePairs = mapOf("9LGIvmb5ugZuUy8EQa6AQmz5hiB3" to "Alex", "LyYOnCbf3zNwI6QxIfzLwyYzTXE3" to "Viktor Fries")
 
     }
 
@@ -669,30 +674,19 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         return listOf(*strings).toSet().toTypedArray()
     }
 
-    // returns the username of the corresponding ownerID
-    private fun getIDsName(ownerId : String)
-    {
-        var s : String?
-        FirebaseDataObjects.getUsers(ownerId){ user ->
-            //This is a callback function, so the code for what needs to happen with the name has to go here, else it will block.
-            user.first().name
-        //    s =
-        }
-       // return s
-    }
-
     // takes an event of a different group and adds the members names who are in that group and this group
     private fun addOverlappingGroupMembers(busyMembers : Array<String>, event : FirebaseDataObjects.Event) : Array<String>
     {
-        var addedArray = busyMembers    // ***************************************** Viktor make this work
+        var addedArray = busyMembers
 
-        /*if (event.participants != null && currentGroup.members != null)
-            for(p in event.participants)
-                for(m in currentGroup.members!!)
-                    if(p == m)
-                        addedArray = addedArray.plus(getIDsName(p))*/
+        addedArray.plus(userIdNamePairs.getValue(event.owner))
 
-        FirebaseDataObjects.getUsers(listOf<String>(*addedArray)){ users -> users}
+        if(event.participants != null)
+            for (participant in event.participants)
+                if(userIdNamePairs.containsKey(participant))
+                    addedArray.plus(userIdNamePairs.getValue(participant))
+
+
         return deleteRepeats(addedArray)
     }
 

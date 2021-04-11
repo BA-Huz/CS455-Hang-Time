@@ -18,24 +18,23 @@ public class GroupCreate : AppCompatActivity() {
         private lateinit var cancelButton: Button
         private lateinit var groupName: EditText
         private lateinit var errorTextView: TextView
+        private lateinit var userSelectFragment : UserSelectFragment
 
         override fun onCreate(savedInstanceState: Bundle?)
         {
                 super.onCreate(savedInstanceState)
-                supportFragmentManager.beginTransaction()
-                        .setReorderingAllowed(true)
-                        .add( R.id.user_select_fragment,UserSelectFragment())
-                        .commit()
-
                 setContentView(R.layout.activity_group_create)
+                setLateinits()
 
+                supportFragmentManager.beginTransaction().apply {
+                        setReorderingAllowed(true)
+                        replace(R.id.user_select_fragment, userSelectFragment, "User_Select_Frag")
+                        //add( R.id.user_select_fragment,UserSelectFragment())
+                        commit()
+                }
 
-                setWidgets()
                 setEventListeners()
                 setAutoComplete()
-
-
-
         }
 
 
@@ -47,8 +46,8 @@ public class GroupCreate : AppCompatActivity() {
                         val users = result!!.map { snapshot ->
                         snapshot.toObject<FirebaseDataObjects.User>()
                         }
-                        UserSelectFragment().setAutoCompleteSource(users)
-
+                        //UserSelectFragment().setAutoCompleteSource(users)
+                        userSelectFragment.setAutoCompleteSource(users)
                 }
                 .addOnFailureListener { exception ->
                         Log.d(TAG, "Error getting documents: ", exception)
@@ -57,7 +56,9 @@ public class GroupCreate : AppCompatActivity() {
         }
 
 
-        private fun setWidgets(){
+        private fun setLateinits(){
+
+                userSelectFragment = UserSelectFragment()
                 saveButton = findViewById(R.id.createGroupButton)
                 cancelButton = findViewById(R.id.cancelButton)
                 groupName = findViewById(R.id.groupName)

@@ -35,7 +35,7 @@
         android:importantForAutofill="no"
         tools:ignore="LabelFor" />
 
-    <Switch
+   <Switch
         android:id="@+id/privateGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
             android:layout_weight="0"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout2" />
 
-        <fragment
+        <FrameLayout
             android:id="@+id/user_select_fragment"
             android:name="com.brandon.hangtime.UserSelectFragment"
             android:layout_width="match_parent"

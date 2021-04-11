@@ -61,12 +61,12 @@ class UserSelectFragment : Fragment() {
         rvUsers.layoutManager = LinearLayoutManager(activity)
     }
 
-    public fun setAutoCompleteSource(users:List<FirebaseDataObjects.User>){
+    internal fun setAutoCompleteSource(users:List<FirebaseDataObjects.User>){
         autoCompleteUsers = users
         rvUsers.adapter?.notifyDataSetChanged()
     }
 
-    public fun getSelectedUsers(): List<FirebaseDataObjects.User> {
+    internal fun getSelectedUsers(): List<FirebaseDataObjects.User> {
         return selectedUsers
     }
 
