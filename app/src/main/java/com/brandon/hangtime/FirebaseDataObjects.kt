@@ -17,7 +17,7 @@ object FirebaseDataObjects {
     data class User(
             val UUID: String = "",
             val email: String = "",
-            val name: String? = null
+            val name: String = ""
     ) : Serializable {
         override fun toString(): String = email
     }
@@ -25,8 +25,8 @@ object FirebaseDataObjects {
 
     data class Event(
             val name: String = "",
-            val startDateTime: Timestamp? = null,
-            val endDateTime: Timestamp? =  null,
+            val startDateTime: Timestamp = Timestamp(0,0),
+            val endDateTime: Timestamp =  Timestamp(0,0),
             val owner: String = "",
             val description: String? = null,
             val participants: List<String>? = null,

@@ -54,6 +54,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // is personal events of group members
     private lateinit var events : List<FirebaseDataObjects.Event>
     private lateinit var userIdNamePairs : Map<String, String>
+    private lateinit var usersInGroup: List<FirebaseDataObjects.User>
 
     // the date of whichever day is displayed in the left column
     // when the first page loads it is set to the current day
@@ -237,28 +238,26 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     private fun toastBusyMembersAtTime(clickedTime : LocalDateTime)
     {
         // build an array of the names of members busy
-        var busyMembers = arrayOf<String>()
+        var busyMembers = listOf<String>()
         if(events != null) {
-            for (e in events) {
-                val start = toLocalDateTime(e.startDateTime!!)
-                val end = toLocalDateTime(e.endDateTime!!)
-                if ((clickedTime < end && clickedTime > start)) // if the clicked time exists within an event
-                {
-                    if ( e.group == null) //and that event is not a group event
-                        busyMembers = busyMembers.plus("${userIdNamePairs.getValue(e.owner)}")
-                    else if (e.group != currentGroup.id) // else and this is a group event of another group
-                        busyMembers = addOverlappingGroupMembers(busyMembers, e)
-                }
+
+            val eventsInInterval = events.filter { event -> toLocalDateTime(event.startDateTime) < clickedTime && toLocalDateTime(event.endDateTime) > clickedTime}
+
+            for (e in eventsInInterval) {
+                if ( e.group == null) //and that event is not a group event
+                    busyMembers = busyMembers.plus("${userIdNamePairs.getValue(e.owner)}")
+                else if (e.group != currentGroup.id) // else and this is a group event of another group
+                    busyMembers = e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }.map{id -> usersInGroup.find{ user -> user.UUID == id }!!.name }
+
             }
 
             // put those names in a string then Toast those names
-            busyMembers = deleteRepeats(busyMembers)
             var message = ""
-            for (m in busyMembers) {
-                if (message == "")
-                    message += "$m"
+            for (m in busyMembers.distinct()) {
+                message += if (message == "")
+                    "$m"
                 else
-                    message += ", $m"
+                    ", $m"
             }
             if (message != "")
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -291,6 +290,27 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         userIdNamePairs = mapOf("9LGIvmb5ugZuUy8EQa6AQmz5hiB3" to "Alex", "LyYOnCbf3zNwI6QxIfzLwyYzTXE3" to "Viktor Fries")
 
     }
+
+    private fun getUsersInGroup(){
+        val eventsColl = Firebase.firestore.collection("users")
+
+        eventsColl
+                .whereIn("UUID", currentGroup.members!!.toList())
+                .get().addOnSuccessListener { result ->
+                    usersInGroup =  result!!.map { snapshot ->
+                        snapshot.toObject<FirebaseDataObjects.User>()
+                    }
+
+
+                    //Successful retrieval listener code goes here
+                    Log.d(TAG, events.toString())
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "Error getting documents: ", exception)
+                }
+
+    }
+
 
     // this function is called before the first region is drawn
     // the values in here cannot be assigned until after onCreate has finished
@@ -632,7 +652,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     {
         val db = Firebase.firestore
 
-        val eventId = event.copy(group = currentGroup.id)
+        val eventId = event.copy(group = currentGroup.id, participants = currentGroup.members)
 
         db.collection("events").document().set(eventId).addOnSuccessListener { documentReference ->
             Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
@@ -680,6 +700,9 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         var addedArray = busyMembers
 
         addedArray.plus(userIdNamePairs.getValue(event.owner))
+
+
+        val x =event.participants?.filter { it -> usersInGroup.map { x-> x.UUID  }.contains(it) }
 
         if(event.participants != null)
             for (participant in event.participants)

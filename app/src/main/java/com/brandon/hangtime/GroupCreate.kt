@@ -29,7 +29,6 @@ public class GroupCreate : AppCompatActivity() {
                 supportFragmentManager.beginTransaction().apply {
                         setReorderingAllowed(true)
                         replace(R.id.user_select_fragment, userSelectFragment, "User_Select_Frag")
-                        //add( R.id.user_select_fragment,UserSelectFragment())
                         commit()
                 }
 
@@ -41,12 +40,10 @@ public class GroupCreate : AppCompatActivity() {
         private fun setAutoComplete(){
                 val usersDB = Firebase.firestore.collection("users")
 
-
                 usersDB.get().addOnSuccessListener {  result ->
                         val users = result!!.map { snapshot ->
                         snapshot.toObject<FirebaseDataObjects.User>()
                         }
-                        //UserSelectFragment().setAutoCompleteSource(users)
                         userSelectFragment.setAutoCompleteSource(users)
                 }
                 .addOnFailureListener { exception ->
@@ -96,7 +93,7 @@ public class GroupCreate : AppCompatActivity() {
                  val id = db.collection("groups").document().id
                  val group:FirebaseDataObjects.Group = FirebaseDataObjects.Group(
                          name,
-                         UserSelectFragment().getSelectedUsers().map{it.UUID },
+                         UserSelectFragment().getSelectedUsers().map{it.UUID }.plus(Firebase.auth.currentUser.uid),
                          Firebase.auth.currentUser.uid,
                          id
                  )

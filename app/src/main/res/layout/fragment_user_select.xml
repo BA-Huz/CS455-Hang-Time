@@ -5,8 +5,7 @@
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
 
-    android:layout_height="wrap_content"
-    android:weightSum="12">
+    android:layout_height="wrap_content">
     <!--android:id="@+id/topFrame"-->
     <AutoCompleteTextView
         android:id="@+id/userSelectText"
@@ -16,7 +15,6 @@
         android:completionHint="Enter an email"
         android:completionThreshold="2"
         android:hint="Enter an email"
-        app:layout_constraintBottom_toTopOf="@+id/rvUsers"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,11 +22,10 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvUsers"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userSelectText" />
 

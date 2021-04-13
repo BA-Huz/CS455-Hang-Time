@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import com.google.firebase.auth.ktx.auth
 import java.util.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -146,6 +147,8 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     internal fun submitNewEvent(event:FirebaseDataObjects.Event)
     {
         val db = Firebase.firestore
+
+        val eventId = event.copy(participants = event.participants!!.plus(Firebase.auth.currentUser.uid ).distinct())
 
         db.collection("events").document().set(event).addOnSuccessListener { documentReference ->
             Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")

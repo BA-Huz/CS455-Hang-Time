@@ -18,6 +18,7 @@ class UserSelectFragment : Fragment() {
 
     private var autoCompleteUsers: List<FirebaseDataObjects.User> = listOf()
     private var selectedUsers:MutableList<FirebaseDataObjects.User> = mutableListOf()
+    private lateinit var adapter:ArrayAdapter<FirebaseDataObjects.User>
     private lateinit var userAutoComplete: AutoCompleteTextView
     private lateinit var rvUsers: RecyclerView
 
@@ -26,10 +27,7 @@ class UserSelectFragment : Fragment() {
     {
         val v = inflater.inflate(R.layout.fragment_user_select, container, false)
 
-
         setLateInits(v)
-
-        // Lookup the recyclerview in activity layout
 
 
         return v
@@ -39,7 +37,7 @@ class UserSelectFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         setAdapters()
-        setAutoCompleteAdapter()
+        //setAutoCompleteAdapter()
     }
 
     private fun setLateInits(v : View)
@@ -63,6 +61,7 @@ class UserSelectFragment : Fragment() {
 
     internal fun setAutoCompleteSource(users:List<FirebaseDataObjects.User>){
         autoCompleteUsers = users
+        setAutoCompleteAdapter()
         rvUsers.adapter?.notifyDataSetChanged()
     }
 
@@ -73,7 +72,7 @@ class UserSelectFragment : Fragment() {
 
     private fun setAutoCompleteAdapter(){
 
-        val adapter = ArrayAdapter(view!!.context, android.R.layout.simple_list_item_1, autoCompleteUsers)
+        adapter = ArrayAdapter(view!!.context, android.R.layout.simple_list_item_1, autoCompleteUsers)
         userAutoComplete.setAdapter(adapter)
 
         userAutoComplete.onItemClickListener = AdapterView.OnItemClickListener{
@@ -82,6 +81,8 @@ class UserSelectFragment : Fragment() {
 
             selectedUsers.add(selectedItem)
             rvUsers.adapter?.notifyItemInserted(selectedUsers.size - 1)
+
+            userAutoComplete.setText("")
         }
 
 
@@ -100,6 +101,7 @@ class UsersAdapter (private val mUsers: MutableList<FirebaseDataObjects.User>) :
         // for any view that will be set as you render a row
         val nameTextView: TextView = itemView.findViewById(R.id.user_name)
         val removeButton: Button = itemView.findViewById(R.id.remove_button)
+
     }
 
 
@@ -121,10 +123,11 @@ class UsersAdapter (private val mUsers: MutableList<FirebaseDataObjects.User>) :
         // Set item views based on your views and data model
         val textView = viewHolder.nameTextView
         textView.text = user.name
-        val button = viewHolder.removeButton
-        button.setOnClickListener {
-            mUsers.removeAt(position)
-            notifyItemRemoved(position)
+
+        viewHolder.removeButton.setOnClickListener {
+            val index = mUsers.indexOf(user)
+            mUsers.removeAt(index)
+            notifyItemRemoved(index)
         }
     }
 
