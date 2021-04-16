@@ -93,7 +93,7 @@ public class GroupCreate : AppCompatActivity() {
                  val id = db.collection("groups").document().id
                  val group:FirebaseDataObjects.Group = FirebaseDataObjects.Group(
                          name,
-                         UserSelectFragment().getSelectedUsers().map{it.UUID }.plus(Firebase.auth.currentUser.uid),
+                         userSelectFragment.getSelectedUsers().map{it.UUID }.plus(Firebase.auth.currentUser.uid),
                          Firebase.auth.currentUser.uid,
                          id
                  )

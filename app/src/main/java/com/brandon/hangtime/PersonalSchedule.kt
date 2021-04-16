@@ -148,11 +148,18 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     {
         val db = Firebase.firestore
 
-        val eventId = event.copy(participants = event.participants!!.plus(Firebase.auth.currentUser.uid ).distinct())
+        val eventId :FirebaseDataObjects.Event =
+                if (event.participants != null) {
+                    event.copy(participants = event.participants!!.plus(Firebase.auth.currentUser.uid ).distinct())
+                }
+                else {
+                    event.copy(participants = listOf(Firebase.auth.currentUser.uid))
+                }
 
-        db.collection("events").document().set(event).addOnSuccessListener { documentReference ->
+
+        db.collection("events").document().set(eventId).addOnSuccessListener { documentReference ->
             Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
-            Toast.makeText(this, "${event.name} has been submitted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "${eventId.name} has been submitted", Toast.LENGTH_SHORT).show()
             (supportFragmentManager.findFragmentByTag("TOP_FRAG_TAG") as FragmentEventEditor).setSaveButtonClickability(true)
             supportFragmentManager.beginTransaction().apply {
                 // set the top FrameLayout to hold the event editor fragments
