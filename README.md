@@ -16,8 +16,6 @@ Hang Time is a social and personal time managment app that alows friend groups t
 
 - [Future Changes](#future-changes)
 
-- [Aknowledgements](#aknowledgements)
-
 ## Installation
 
 ## App Usage
@@ -27,8 +25,6 @@ Hang Time is a social and personal time managment app that alows friend groups t
 ## Manifest
 
 ## Future Changes
-
-## Aknowledgements
 
 
 
