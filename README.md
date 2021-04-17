@@ -9,15 +9,15 @@ Hang Time is a social and personal time managment app that alows friend groups t
 
 Installation
 
-App Usage
+#App Usage
 
-Use Case
+#Use Case
 
-Manifest
+#Manifest
 
-Future Changes
+#Future Changes
 
-Aknowledgments
+#Aknowledgments
 
 
 
