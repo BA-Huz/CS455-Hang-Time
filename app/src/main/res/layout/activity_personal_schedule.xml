@@ -3,42 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".PersonalSchedule"
+    android:layout_height="wrap_content"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintLeft_toLeftOf="parent"
     app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintTop_toTopOf="parent" >
+    app:layout_constraintTop_toTopOf="parent"
+    tools:context=".PersonalSchedule">
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="10">
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4.5"
         android:id="@+id/personalCalendarTopFragment"
-        app:layout_constraintTop_toTopOf="parent"/>
-        <!--android:name="com.brandon.hangtime.FragmentPersonalCalendar"-->
-
-    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4.5"
-        android:id="@+id/personalEventListFragment"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-        <!--android:name="com.brandon.hangtime.FragmentPersonalEventList"-->
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/personalEventCalendarSwapButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 
     <Button
+        android:id="@+id/personalEventCalendarSwapButton"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:text=""
-        android:id = "@+id/personalEventCalendarSwapButton"/>
-
-
-</LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/personalCalendarTopFragment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

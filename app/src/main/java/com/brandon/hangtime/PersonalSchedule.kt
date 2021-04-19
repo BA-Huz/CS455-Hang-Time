@@ -30,11 +30,9 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     private lateinit var swapButton : Button
     private var isShowingCalendar = true
     private lateinit var topFrame: FrameLayout
-    private lateinit var bottomFrame : FrameLayout
 
     private lateinit var personalCalendarFragment : FragmentPersonalCalendar
     private lateinit var eventEditorFragment : FragmentEventEditor
-    private lateinit var bottomFragment : FragmentPersonalEventList
 
     // this variable will tell us if we are creating an event start time or end time
     private var startTimePicker = true
@@ -52,9 +50,7 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         //.apply is a scope function so we can write code without adding in blah.blah.blah. to make use of the functions lik replace
         supportFragmentManager.beginTransaction().apply {
-            // set the two FrameLayouts to hold these 2 fragments
             replace(R.id.personalCalendarTopFragment, personalCalendarFragment, "TOP_FRAG_TAG")
-            replace(R.id.personalEventListFragment, bottomFragment, "BOTTOM_FRAG_TAG")
             commit()
         }
     }
@@ -63,13 +59,11 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     private fun setLateInits()
     {
         topFrame = findViewById(R.id.personalCalendarTopFragment)
-        bottomFrame = findViewById(R.id.personalEventListFragment)
         swapButton = findViewById(R.id.personalEventCalendarSwapButton)
         swapButton.text = "Add Event"
 
         personalCalendarFragment = FragmentPersonalCalendar()
         eventEditorFragment = FragmentEventEditor()
-        bottomFragment = FragmentPersonalEventList()
     }
 
 

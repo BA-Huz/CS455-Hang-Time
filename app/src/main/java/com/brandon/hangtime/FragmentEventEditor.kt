@@ -159,12 +159,12 @@ class FragmentEventEditor : Fragment()
 
         if(startTimeEdit)
         {
-            startTimeWidget.setText("${eventTime.month.toString()}  ${eventTime.dayOfMonth}  at  $h:$m $M")
+            startTimeWidget.setText("${eventTime.month}  ${eventTime.dayOfMonth}  at  $h:$m $M")
             startDate = eventTime
         }
         else
         {
-            endTimeWidget.setText("${eventTime.month.toString()}  ${eventTime.dayOfMonth}  at  $h:$m $M")
+            endTimeWidget.setText("${eventTime.month}  ${eventTime.dayOfMonth}  at  $h:$m $M")
             endDate = eventTime
         }
     }

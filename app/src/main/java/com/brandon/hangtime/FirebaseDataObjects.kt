@@ -33,6 +33,9 @@ object FirebaseDataObjects {
             val group: String? = null
             ) : Serializable {
         override fun toString(): String = name
+        //fun toTimeString():String = "${name} ${startDateTime} - ${endDateTime}"
+
+
     }
 
 
