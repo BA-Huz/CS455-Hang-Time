@@ -1,18 +1,16 @@
-package com.brandon.hangtime;
+package com.brandon.hangtime
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.activity_group_create.*
 
-public class GroupCreate : AppCompatActivity() {
+class GroupCreate : AppCompatActivity() {
 
         private lateinit var saveButton: Button
         private lateinit var cancelButton: Button
@@ -93,8 +91,8 @@ public class GroupCreate : AppCompatActivity() {
                  val id = db.collection("groups").document().id
                  val group:FirebaseDataObjects.Group = FirebaseDataObjects.Group(
                          name,
-                         userSelectFragment.getSelectedUsers().map{it.UUID }.plus(Firebase.auth.currentUser.uid),
-                         Firebase.auth.currentUser.uid,
+                         userSelectFragment.getSelectedUsers().map{it.UUID }.plus(Firebase.auth.currentUser!!.uid),
+                         Firebase.auth.currentUser!!.uid,
                          id
                  )
 

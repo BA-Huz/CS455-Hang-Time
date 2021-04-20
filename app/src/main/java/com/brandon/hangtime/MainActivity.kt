@@ -66,29 +66,10 @@ class MainActivity : AppCompatActivity()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         if(currentUser != null){
-            updateUI(currentUser);
+            updateUI(currentUser)
         }
     }
 
-    override fun onResume()
-    {
-        super.onResume()
-    }
-
-    override fun onPause()
-    {
-        super.onPause()
-    }
-
-    override fun onStop()
-    {
-        super.onStop()
-    }
-
-    override fun onDestroy()
-    {
-        super.onDestroy()
-    }
     // end of call back overrides   **********   end of call back overrides   **********   end of call back overrides
 
     // when we kill the activity when going between portrait or landscape
@@ -222,10 +203,6 @@ class MainActivity : AppCompatActivity()
         }
         return s.dropLast(numOfSpaces)
     }
-
-    private fun reload(){
-    }
-
 
     private fun updateUI(user: FirebaseUser?) {
 

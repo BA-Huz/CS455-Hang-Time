@@ -1,6 +1,5 @@
 package com.brandon.hangtime
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.Bitmap
@@ -24,7 +23,6 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.text.DateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -158,7 +156,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
             }
         }
 
-        scrollView.setOnTouchListener { v: View, m: MotionEvent ->
+        scrollView.setOnTouchListener { _: View, m: MotionEvent ->
             detectedTouch(m)
             true
         }
@@ -173,13 +171,13 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         // this first snippet works to test if the user is holding a touch on an event region
         // hold flag 1 stops the thread from multi instantiating itself
         // hold flag 2 stops the toast from happening if the user lifted their finger up during the threads sleep
-        if(holdFlag1 == false && holdFlag2 == false)
+        if(!holdFlag1 && !holdFlag2)
         {
             holdFlag1 = true
             holdFlag2 = true
             GlobalScope.launch{
                 Thread.sleep(500)
-                if(holdFlag2 == true) // if we were holding this whole time
+                if(holdFlag2) // if we were holding this whole time
                 {
                     if(m.x >= day1ImageView.left && m.x <= day1ImageView.right)
                         Handler(Looper.getMainLooper()).post(Runnable { toastBusyMembersAtTime(clickPostionToTime(m.y, true)) })
@@ -215,7 +213,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         // else if this was an action up then see if the values of the down and up validate a swipe
         else if(m.action == MotionEvent.ACTION_UP)
         {
-            holdFlag2 = false;
+            holdFlag2 = false
             lastMove = 0
             nowMove = 0
             touchUpX = m.x
@@ -239,29 +237,27 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     {
         // build an array of the names of members busy
         var busyMembers = listOf<String>()
-        if(events != null) {
 
-            val eventsInInterval = events.filter { event -> toLocalDateTime(event.startDateTime) < clickedTime && toLocalDateTime(event.endDateTime) > clickedTime}
+        val eventsInInterval = events.filter { event -> toLocalDateTime(event.startDateTime) < clickedTime && toLocalDateTime(event.endDateTime) > clickedTime}
 
-            for (e in eventsInInterval) {
-                if ( e.group == null) //and that event is not a group event
-                    busyMembers = busyMembers.plus("${userIdNamePairs.getValue(e.owner)}")
-                else if (e.group != currentGroup.id) // else and this is a group event of another group
-                    busyMembers = e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }.map{id -> usersInGroup.find{ user -> user.UUID == id }!!.name }
+        for (e in eventsInInterval) {
+            if ( e.group == null) //and that event is not a group event
+                busyMembers = busyMembers.plus(userIdNamePairs.getValue(e.owner))
+            else if (e.group != currentGroup.id) // else and this is a group event of another group
+                busyMembers = e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }.map{id -> usersInGroup.find{ user -> user.UUID == id }!!.name }
 
-            }
-
-            // put those names in a string then Toast those names
-            var message = ""
-            for (m in busyMembers.distinct()) {
-                message += if (message == "")
-                    "$m"
-                else
-                    ", $m"
-            }
-            if (message != "")
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
+
+        // put those names in a string then Toast those names
+        var message = ""
+        for (m in busyMembers.distinct()) {
+            message += if (message == "")
+                m
+            else
+                ", $m"
+        }
+        if (message != "")
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     // Grabs events from the database that happen on the 31st of march and puts them into the events list
@@ -291,26 +287,6 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
     }
 
-    private fun getUsersInGroup(){
-        val eventsColl = Firebase.firestore.collection("users")
-
-        eventsColl
-                .whereIn("UUID", currentGroup.members!!.toList())
-                .get().addOnSuccessListener { result ->
-                    usersInGroup =  result!!.map { snapshot ->
-                        snapshot.toObject<FirebaseDataObjects.User>()
-                    }
-
-
-                    //Successful retrieval listener code goes here
-                    Log.d(TAG, events.toString())
-                }
-                .addOnFailureListener { exception ->
-                    Log.d(TAG, "Error getting documents: ", exception)
-                }
-
-    }
-
 
     // this function is called before the first region is drawn
     // the values in here cannot be assigned until after onCreate has finished
@@ -327,7 +303,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         day2ImageView.background = BitmapDrawable(resources, day2BitMap)
     }
 
-    //draws lines to corespond with each hour
+    //draws lines to correspond with each hour
     private fun drawHourLines()
     {
         val paint = Paint()
@@ -379,82 +355,70 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // it then sorts theses times for drawing rectangles we called regions
     private fun parseAndDrawEvents()
     {
-        var parsedEventsLeftDay = mutableListOf<FirebaseDataObjects.EventTimeComponent>()
-        var parsedEventsRightDay = mutableListOf<FirebaseDataObjects.EventTimeComponent>()
+        val parsedEventsLeftDay = mutableListOf<FirebaseDataObjects.EventTimeComponent>()
+        val parsedEventsRightDay = mutableListOf<FirebaseDataObjects.EventTimeComponent>()
 
         // put necessary info into the left and right days
         for(e in events)
         {
-            val start = toLocalDateTime(e.startDateTime!!)
-            val end = toLocalDateTime(e.endDateTime!!)
+            val start = toLocalDateTime(e.startDateTime)
+            val end = toLocalDateTime(e.endDateTime)
 
             // put start time in left day
             if(start.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
 
-                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == currentGroup.id))
-                parsedEventsLeftDay.add(toAdd)
+                parsedEventsLeftDay.add(FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == currentGroup.id)))
                 // if it ends after left day
                 if (end.dayOfMonth > displayedLeftDay.dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id))
-                    parsedEventsLeftDay.add(toAdd)
+                    parsedEventsLeftDay.add(FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id)))
                 }
             }
             // put start time in right day
             else if(start.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == currentGroup.id))
-                parsedEventsRightDay.add(toAdd)
+                parsedEventsRightDay.add(FirebaseDataObjects.EventTimeComponent(start.hour, start.minute, true, (e.group != null && e.group == currentGroup.id)))
                 // if it ends after right day
                 if (end.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id))
-                    parsedEventsRightDay.add(toAdd)
+                    parsedEventsRightDay.add(FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id)))
                 }
             }
 
             // put end time in left day
             if(end.dayOfMonth == displayedLeftDay.dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == currentGroup.id))
-                parsedEventsLeftDay.add(toAdd)
+                parsedEventsLeftDay.add(FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == currentGroup.id)))
                 // if it starts before left day
                 if (start.dayOfMonth < displayedLeftDay.dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id))
-                    parsedEventsLeftDay.add(toAdd)
+                    parsedEventsLeftDay.add(FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id)))
                 }
             }
             // put end time in right day
             else if(end.dayOfMonth == displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                val toAdd = FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == currentGroup.id))
-                parsedEventsRightDay.add(toAdd)
+                parsedEventsRightDay.add(FirebaseDataObjects.EventTimeComponent(end.hour, end.minute, false, (e.group != null && e.group == currentGroup.id)))
                 // if it starts before right day
                 if (start.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth)
                 {
-                    val toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id))
-                    parsedEventsRightDay.add(toAdd)
+                    parsedEventsRightDay.add(FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id)))
                 }
             }
 
             //if an event starts before and ends after the left day
             if(start.dayOfMonth < displayedLeftDay.dayOfMonth && end.dayOfMonth > displayedLeftDay.dayOfMonth)
             {
-                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id))
-                parsedEventsLeftDay.add(toAdd)
-                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id))
-                parsedEventsLeftDay.add(toAdd)
+                parsedEventsLeftDay.add(FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id)))
+                parsedEventsLeftDay.add(FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id)))
             }
 
             //if an event starts before and ends after the right day
             if(start.dayOfMonth < displayedLeftDay.plusDays(1).dayOfMonth && end.dayOfMonth > displayedLeftDay.plusDays(1).dayOfMonth)
             {
-                var toAdd = FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id))
-                parsedEventsRightDay.add(toAdd)
-                toAdd = FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id))
-                parsedEventsRightDay.add(toAdd)
+                parsedEventsRightDay.add(FirebaseDataObjects.EventTimeComponent(0, 0, true, (e.group != null && e.group == currentGroup.id)))
+                parsedEventsRightDay.add(FirebaseDataObjects.EventTimeComponent(24, 0, false, (e.group != null && e.group == currentGroup.id)))
             }
 
         }
@@ -477,7 +441,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                     gCounter++
                 else
                     numberBusy++
-                drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i + 1].hour, parsedEventsLeftDay[i + 1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
+                drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i + 1].hour, parsedEventsLeftDay[i + 1].minute), groupAvailabilityColour(numberBusy, gCounter > 0))
             }
             // else it is an end time
             else
@@ -487,7 +451,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                 else
                     numberBusy--
                 if(numberBusy > 0)
-                    drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i + 1].hour, parsedEventsLeftDay[i + 1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
+                    drawRegion(true, timeToFloat(parsedEventsLeftDay[i].hour, parsedEventsLeftDay[i].minute), timeToFloat(parsedEventsLeftDay[i + 1].hour, parsedEventsLeftDay[i + 1].minute), groupAvailabilityColour(numberBusy, gCounter > 0))
             }
             i++
         }
@@ -504,7 +468,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                     gCounter++
                 else
                     numberBusy++
-                drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i + 1].hour, parsedEventsRightDay[i + 1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
+                drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i + 1].hour, parsedEventsRightDay[i + 1].minute), groupAvailabilityColour(numberBusy, gCounter > 0))
             }
             // else it is an end time
             else
@@ -514,7 +478,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                 else
                     numberBusy--
                 if(numberBusy > 0)
-                    drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i + 1].hour, parsedEventsRightDay[i + 1].minute), groupAvailibilityColour(numberBusy, gCounter > 0))
+                    drawRegion(false, timeToFloat(parsedEventsRightDay[i].hour, parsedEventsRightDay[i].minute), timeToFloat(parsedEventsRightDay[i + 1].hour, parsedEventsRightDay[i + 1].minute), groupAvailabilityColour(numberBusy, gCounter > 0))
             }
             i++
         }
@@ -523,11 +487,11 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // Draws a single region on either day1 column or day 2 column
     private fun drawRegion(isFirstDay: Boolean, startTime: Float, endTime: Float, colour: String)
     {
-        var region = ShapeDrawable(RectShape())
+        val region = ShapeDrawable(RectShape())
 
         if(isFirstDay)
         {
-            // if two users have events at the same time, dont draw a flat region, ei start time == end time
+            // if two users have events at the same time, don't draw a flat region, ei start time == end time
             if(startTime != endTime)
             {
                 region.setBounds(0, (scalar * startTime).toInt(), day1ImageView.width, (scalar * endTime).toInt())
@@ -548,38 +512,33 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     }
 
     // takes the number of users in a group and the number of those users that are busy
-    // and calculates a shade of grey to represent overall group availibility
-    // darker grey for more avalible, lighter for less
+    // and calculates a shade of grey to represent overall group availability
+    // darker grey for more available, lighter for less
     // blue for this groups events, darker blue if this groups event that members are already busy for
-    private fun groupAvailibilityColour(numberBusy: Int, hasGroupEventAtThisTime: Boolean) : String
+    private fun groupAvailabilityColour(numberBusy: Int, hasGroupEventAtThisTime: Boolean) : String
     {
-        var busyPercentage = 0f
-        if (numberBusy > 0)
-            busyPercentage = numberBusy.toFloat()/numberInGroup.toFloat()
+        val busyPercentage: Float = if (numberBusy > 0)
+            numberBusy.toFloat()/numberInGroup.toFloat()
         else
-            busyPercentage = numberBusy.toFloat()/numberInGroup.toFloat() * -1
+            numberBusy.toFloat()/numberInGroup.toFloat() * -1
 
-        if(! hasGroupEventAtThisTime)
+        if(!hasGroupEventAtThisTime)
         {
-            if (busyPercentage > 0.5f)
-                return "#463E3F" // black eel
-            else if (busyPercentage > 0.25f)
-                return "#666362" // ash grey
-            else if (busyPercentage >= 0.1f)
-                return "#B6B6B4" // grey cloud
-            else
-                return "#E5E4E2" // platinum
+            return when {
+                busyPercentage > 0.5f -> "#463E3F" // black eel
+                busyPercentage > 0.25f -> "#666362" // ash grey
+                busyPercentage >= 0.1f -> "#B6B6B4" // grey cloud
+                else -> "#E5E4E2"
+            } // platinum
         }
         else
         {
-            if (busyPercentage > 0.5f)
-                return "#000066"
-            else if (busyPercentage > 0.25f)
-                return "#000099" // Lapis Blue
-            else if (busyPercentage >= 0.1f)
-                return "#0000b3" // grey cloud
-            else
-                return "#0000cc" // platinum
+            return when {
+                busyPercentage > 0.5f -> "#000066"
+                busyPercentage > 0.25f -> "#000099" // Lapis Blue
+                busyPercentage >= 0.1f -> "#0000b3" // grey cloud
+                else -> "#0000cc"
+            } // platinum
         }
     }
 
@@ -592,10 +551,10 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // changes the displayed days to adjacent days depending on swipe direction
     private fun swipe(isLeftSwipe: Boolean)
     {
-        if(isLeftSwipe)
-            displayedLeftDay = displayedLeftDay.plusDays(2)
+        displayedLeftDay = if(isLeftSwipe)
+            displayedLeftDay.plusDays(2)
         else
-            displayedLeftDay = displayedLeftDay.plusDays(-2)
+            displayedLeftDay.plusDays(-2)
 
         if(showingTwoDayFragment)
             (supportFragmentManager.findFragmentByTag("TOP_FRAG") as TwoDayViewFragment).setDisplayedDays(displayedLeftDay)
@@ -682,35 +641,10 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         minute -= (minute % 0.01f)
         minute *= 100
 
-        if(isLeftDay)
-            return LocalDateTime.of(displayedLeftDay.year, displayedLeftDay.month, displayedLeftDay.dayOfMonth, hour.toInt(), minute.toInt())
+        return if(isLeftDay)
+            LocalDateTime.of(displayedLeftDay.year, displayedLeftDay.month, displayedLeftDay.dayOfMonth, hour.toInt(), minute.toInt())
         else
-            return LocalDateTime.of(displayedLeftDay.plusDays(1).year, displayedLeftDay.plusDays(1).month, displayedLeftDay.plusDays(1).dayOfMonth, hour.toInt(), minute.toInt())
-    }
-
-    // deletes any duplicate strings in an array
-    private fun deleteRepeats(strings : Array<String>) : Array<String>
-    {
-        return listOf(*strings).toSet().toTypedArray()
-    }
-
-    // takes an event of a different group and adds the members names who are in that group and this group
-    private fun addOverlappingGroupMembers(busyMembers : Array<String>, event : FirebaseDataObjects.Event) : Array<String>
-    {
-        var addedArray = busyMembers
-
-        addedArray.plus(userIdNamePairs.getValue(event.owner))
-
-
-        val x =event.participants?.filter { it -> usersInGroup.map { x-> x.UUID  }.contains(it) }
-
-        if(event.participants != null)
-            for (participant in event.participants)
-                if(userIdNamePairs.containsKey(participant))
-                    addedArray.plus(userIdNamePairs.getValue(participant))
-
-
-        return deleteRepeats(addedArray)
+            LocalDateTime.of(displayedLeftDay.plusDays(1).year, displayedLeftDay.plusDays(1).month, displayedLeftDay.plusDays(1).dayOfMonth, hour.toInt(), minute.toInt())
     }
 
     companion object {

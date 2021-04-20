@@ -144,10 +144,10 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         val eventId :FirebaseDataObjects.Event =
                 if (event.participants != null) {
-                    event.copy(participants = event.participants!!.plus(Firebase.auth.currentUser.uid ).distinct())
+                    event.copy(participants = event.participants.plus(Firebase.auth.currentUser!!.uid ).distinct())
                 }
                 else {
-                    event.copy(participants = listOf(Firebase.auth.currentUser.uid))
+                    event.copy(participants = listOf(Firebase.auth.currentUser!!.uid))
                 }
 
 

@@ -19,8 +19,6 @@ class FragmentEventEditor : Fragment()
     private lateinit var startTimeWidget : TextView
     private lateinit var endTimeWidget: TextView
     private lateinit var eventNameWidget : EditText
-    private lateinit var eventDescriptionWidget : EditText
-    //private lateinit var repetitiveRadioGroup : RadioGroup
     private lateinit var saveButton : Button
     private lateinit var nonRepeatingRadio : RadioButton
     private lateinit var dailyRepeatingRadio : RadioButton
@@ -63,9 +61,6 @@ class FragmentEventEditor : Fragment()
         endTimeWidget.inputType = InputType.TYPE_NULL
 
         eventNameWidget = v.findViewById(R.id.personalEventNameEditText)
-        //eventDescriptionWidget = v.findViewById(R.id.DescriptionEditText)
-
-       // repetitiveRadioGroup = v.findViewById(R.id.repetitiveRadios)
 
         saveButton = v.findViewById((R.id.savePersonalEventButton))
 
@@ -110,8 +105,8 @@ class FragmentEventEditor : Fragment()
                             eventNameWidget.text.toString(),
                             FirebaseDataObjects.toTimestamp(startDate),
                             FirebaseDataObjects.toTimestamp(endDate),
-                            Firebase.auth.currentUser.uid,
-                            "", //eventDescriptionWidget.text.toString()
+                            Firebase.auth.currentUser!!.uid,
+                            "",
                             null
                     )
                     if(myParent == Parent.PERSONALSCHEDULE)
@@ -132,39 +127,37 @@ class FragmentEventEditor : Fragment()
     // time into the edit texts
     internal fun setEdits(startTimeEdit : Boolean, eventTime:LocalDateTime)
     {
-        var h = ""
-        var m = ""
-        var M = "AM"
+        val hour: String
+        val period: String
 
-        if(eventTime.hour == 0)
-        {// time is 12 am
-            h = "12"
-        }
-        else if (eventTime.hour > 12)
-        {
-            // time is between 10pm and 12pm
-            h = "${eventTime.hour - 12}"
-            M = "PM"
-        }
-        else
-        {
-            // time is between 10 am and 11 am
-            h = "${eventTime.hour}"
+        when {
+            eventTime.hour == 0 -> {// time is 12 am
+                hour = "12"
+                period = "AM"
+            }
+            eventTime.hour > 12 -> {  // time is between 10pm and 12pm
+                hour = "${eventTime.hour - 12}"
+                period = "PM"
+            }
+            else -> { // time is between 10 am and 11 am
+                hour = "${eventTime.hour}"
+                period = "AM"
+            }
         }
 
-        if(eventTime.minute < 10)
-            m = "0${eventTime.minute}"
+        val minute: String = if(eventTime.minute < 10)
+            "0${eventTime.minute}"
         else
-            m = "${eventTime.minute}"
+            "${eventTime.minute}"
 
         if(startTimeEdit)
         {
-            startTimeWidget.setText("${eventTime.month}  ${eventTime.dayOfMonth}  at  $h:$m $M")
+            startTimeWidget.text = "${eventTime.month} ${eventTime.dayOfMonth} at $hour:$minute $period"
             startDate = eventTime
         }
         else
         {
-            endTimeWidget.setText("${eventTime.month}  ${eventTime.dayOfMonth}  at  $h:$m $M")
+            endTimeWidget.text = "${eventTime.month} ${eventTime.dayOfMonth} at $hour:$minute $period"
             endDate = eventTime
         }
     }
@@ -172,7 +165,7 @@ class FragmentEventEditor : Fragment()
     // returns true if all the fields are filled
     private fun allFieldsFilled() : Boolean
     {
-        return if(eventNameWidget.text.toString().isNullOrBlank() || (startTimeWidget.text.toString().isNullOrBlank() || endTimeWidget.text.toString().isNullOrBlank() ))
+        return if(eventNameWidget.text.toString().isBlank() || (startTimeWidget.text.toString().isBlank() || endTimeWidget.text.toString().isBlank() ))
         {
             if(myParent == Parent.PERSONALSCHEDULE)
                 Toast.makeText(activity as PersonalSchedule, "All fields must be filled", Toast.LENGTH_SHORT).show()

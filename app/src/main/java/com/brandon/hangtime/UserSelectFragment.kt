@@ -8,10 +8,6 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.fragment_user_select.*
 
 
 class UserSelectFragment : Fragment() {
@@ -49,7 +45,7 @@ class UserSelectFragment : Fragment() {
 
     }
 
-    fun setAdapters(){
+    private fun setAdapters(){
         // Initialize contacts
         // Create adapter passing in the sample user data
         val adapter = UsersAdapter(selectedUsers)

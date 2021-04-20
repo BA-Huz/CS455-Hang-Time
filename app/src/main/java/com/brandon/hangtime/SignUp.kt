@@ -51,25 +51,6 @@ class SignUp : AppCompatActivity()
         }
     }
 
-    override fun onResume()
-    {
-        super.onResume()
-    }
-
-    override fun onPause()
-    {
-        super.onPause()
-    }
-
-    override fun onStop()
-    {
-        super.onStop()
-    }
-
-    override fun onDestroy()
-    {
-        super.onDestroy()
-    }
     // end of call back overrides   **********   end of call back overrides   **********   end of call back overrides
 
     // puts the text in errorTextView into the saved instance state

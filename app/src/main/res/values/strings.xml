@@ -29,4 +29,8 @@
     <string name="enter_someones_name_to_add_them_to_the_group">Enter someones name to add them to the group</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <!-- These strings are used with displaying events -->
+    <string name="start">Start: %1$s</string>
+    <string name="end">End: %1$s</string>
+
 </resources>

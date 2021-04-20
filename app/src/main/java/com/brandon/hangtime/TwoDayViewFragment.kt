@@ -1,12 +1,11 @@
 package com.brandon.hangtime
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import java.text.DateFormat
+import androidx.fragment.app.Fragment
 import java.time.LocalDateTime
 
 class TwoDayViewFragment : Fragment()
@@ -31,7 +30,7 @@ class TwoDayViewFragment : Fragment()
 
     internal fun setDisplayedDays(leftDate : LocalDateTime)
     {
-        leftDay.text = "${leftDate.month.toString()}   ${leftDate.dayOfMonth}"
-        rightDay.text = "${leftDate.plusDays(1).month.toString()}   ${leftDate.plusDays(1).dayOfMonth}"
+        leftDay.text = "${leftDate.month}   ${leftDate.dayOfMonth}"
+        rightDay.text = "${leftDate.plusDays(1).month}   ${leftDate.plusDays(1).dayOfMonth}"
     }
 }
