@@ -20,6 +20,18 @@ Hang Time is a social and personal time managment app that alows friend groups t
 - [Future Changes](#future-changes)
 
 ## Installation
+Download a copy of the repo and ensure all libraries and dependencies are up to date. To run your own instance of Hang Time, you will need to create a Google Firebase application for it to interface with. There are instructions on how to do that [here](https://firebase.google.com/docs/android/setup).
+Once your application is linked with Firebase, you will need to create collections in Firestore. Create three collections called "events", "groups", and "users" respectively. You will also need to update the Firestore rules to allow authenticated users to access Firestore. Change the rules to the following to allow all authenticated users read and write access.
+```javascript
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+```
+You should be able to build and run the application now. When running the application, you may receive _collection not indexed_ errors when querrying Firestore. These errors should contain a link that will automatically index the appropriate collections and prevent these errors from happening again in the future.
 
 ## App Usage
 ### Starting Out
