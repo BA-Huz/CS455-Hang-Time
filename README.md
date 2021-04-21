@@ -78,6 +78,8 @@ Some features that weren't able to make the initial release of Hang Time are sti
 While modifying Firestore documents is trivial, creating the UI to easily and intuitively edit events or groups is more complicated. The next feature we'd like to see implemented is a simple way to edit these documents so that users can easily fix mistakes or update their plans as things change.
 ### Push Notifications
 Automatically notifying your friends of upcoming scheduled events, or letting them know about events you've created right now. Notifications would alleviate the hassle of having to constantly check Hang Time to see who is available. 
+### Recurring Events
+While Hang Time events are generally spontaneous, we'd like to add the functionality for users to easily set up repeating events. This would allow users to easily mark off times they are always busy, such as with work, or schedule group events for the same time every week, such as RPG meetups.
 ### Friend Codes
 Currently, inviting a friend to one of your groups requires you to know their email address. In the future, we'd like to implement a variety of easier ways to connect with friends such as scanable QR codes, hyper links, and short codes that can easily be used to join grups or add people to them without requiring you to know everything about someone.
 
