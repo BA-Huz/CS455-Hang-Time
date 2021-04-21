@@ -43,7 +43,7 @@ Your first time using Hangtime will look quite similar to your first use of many
 ### Your Personal Calendar
 In your personal calendar you can choose to add an event. Events need a name, and a starting and ending time. Once you have submitted an event youll notice that selecting the day on the calendar in which your event takes place will show it in a list. This list shows all the events in your currently selected day.
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/56166683/115486829-aa96fe80-a214-11eb-9351-42658c8a411f.jpg" width="200" height="40>
+  <img src="https://user-images.githubusercontent.com/56166683/115486829-aa96fe80-a214-11eb-9351-42658c8a411f.jpg" width="200" height="1000">
 </p>
 
 
