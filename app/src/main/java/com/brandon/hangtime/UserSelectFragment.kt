@@ -54,6 +54,7 @@ class UserSelectFragment : Fragment() {
         rvUsers.layoutManager = LinearLayoutManager(activity)
     }
 
+    //Sets the autocomplete source to a list of users
     internal fun setAutoCompleteSource(users:List<FirebaseDataObjects.User>){
         autoCompleteUsers = users
         setAutoCompleteAdapter()
@@ -85,23 +86,16 @@ class UserSelectFragment : Fragment() {
 
 }
 
-
-
-
+//RecyclerView adapter that interfaces with a list of Users
 class UsersAdapter (private val mUsers: MutableList<FirebaseDataObjects.User>) : RecyclerView.Adapter<UsersAdapter.ViewHolder>(){
-    // Provide a direct reference to each of the views within a data item
-    // Used to cache the views within the item layout for fast access
+
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
-        // Your holder should contain and initialize a member variable
-        // for any view that will be set as you render a row
+
         val nameTextView: TextView = itemView.findViewById(R.id.user_name)
         val removeButton: Button = itemView.findViewById(R.id.remove_button)
 
     }
 
-
-    // ... constructor and member variables
-    // Usually involves inflating a layout from XML and returning the holder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsersAdapter.ViewHolder {
         val context = parent.context
         val inflater = LayoutInflater.from(context)
@@ -111,7 +105,6 @@ class UsersAdapter (private val mUsers: MutableList<FirebaseDataObjects.User>) :
         return ViewHolder(contactView)
     }
 
-    // Involves populating data into the item through holder
     override fun onBindViewHolder(viewHolder: UsersAdapter.ViewHolder, position: Int) {
         // Get the data model based on position
         val user: FirebaseDataObjects.User = mUsers[position]
@@ -126,7 +119,6 @@ class UsersAdapter (private val mUsers: MutableList<FirebaseDataObjects.User>) :
         }
     }
 
-    // Returns the total count of items in the list
     override fun getItemCount(): Int {
         return mUsers.size
     }

@@ -42,7 +42,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // scalar is used to line up the event regions with the hours
     // each hour is 60dp apart in xml and in  kotlin code 180 apart
     private var scalar = 0
-    private var setScaler = false
+    private var setScalar = false
 
     // the number of users in the current group
     // will be given a new value in get events
@@ -50,9 +50,9 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
     // a list of events that we will grab from the db. each event
     // is personal events of group members
-    private lateinit var events : List<FirebaseDataObjects.Event>
-    private lateinit var userIdNamePairs : Map<String, String>
-    private lateinit var usersInGroup: List<FirebaseDataObjects.User>
+    private var events : List<FirebaseDataObjects.Event> = listOf()
+    private var usersInGroup: List<FirebaseDataObjects.User> = listOf()
+    private var usersFetched = false
 
     // the date of whichever day is displayed in the left column
     // when the first page loads it is set to the current day
@@ -90,10 +90,12 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     private lateinit var day1ImageView : ImageView
     private lateinit var day2ImageView : ImageView
     private lateinit var eventButton : Button
+    private lateinit var addMemberButton : Button
 
     // the two fragments used by this activity and a bool to represent which is active
     private lateinit var twoDayViewFragment : TwoDayViewFragment
     private lateinit var eventEditorFragment : FragmentEventEditor
+    private lateinit var userSelectFragment: UserSelectFragment
     private var showingTwoDayFragment = true
 
 
@@ -126,18 +128,20 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         day2ImageView = findViewById(R.id.groupCalendarDay2)
 
         eventButton = findViewById(R.id.GroupEventButton)
+        addMemberButton = findViewById(R.id.addGroupMember)
 
         twoDayViewFragment = TwoDayViewFragment()
         eventEditorFragment = FragmentEventEditor()
-
+        userSelectFragment = UserSelectFragment()
     }
 
     private fun setListeners()
     {
         eventButton.setOnClickListener {
-            if(eventButton.text == "Schedule a Group Event")
+            if(showingTwoDayFragment)
             {
                 eventButton.text = "Back To Day View"
+                addMemberButton.isClickable = false
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.topFrame, eventEditorFragment, "TOP_FRAG")   // eventEditorFragment throwing exception uninitialized property access exception
                     commit()
@@ -148,6 +152,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
             else
             {
                 eventButton.text = "Schedule a Group Event"
+                addMemberButton.isClickable = true
                 supportFragmentManager.beginTransaction().apply{
                     replace(R.id.topFrame, twoDayViewFragment, "TOP_FRAG")
                     commit()
@@ -155,6 +160,60 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                 showingTwoDayFragment = true
             }
         }
+
+        addMemberButton.setOnClickListener {
+            if (!usersFetched){
+                val usersDB = Firebase.firestore.collection("users")
+
+                usersDB.get().addOnSuccessListener {  result ->
+                    val users = result!!.map { snapshot ->
+                        snapshot.toObject<FirebaseDataObjects.User>()
+                    }
+                    userSelectFragment.setAutoCompleteSource(users)
+                    usersFetched = true
+                }
+                        .addOnFailureListener { exception ->
+                            Log.d(TAG, "Error getting documents: ", exception)
+                        }
+            }
+            if(showingTwoDayFragment)
+            {
+                eventButton.text = "Back To Day View"
+                addMemberButton.text = "Add Member"
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.topFrame, userSelectFragment, "TOP_FRAG")   // eventEditorFragment throwing exception uninitialized property access exception
+                    commit()
+                }
+                showingTwoDayFragment = false
+                eventEditorFragment.setParent(FragmentEventEditor.Parent.GROUPCALENDAR)
+            }
+            else {
+                eventButton.text = "Schedule a Group Event"
+                addMemberButton.isClickable = true
+
+                val users = userSelectFragment.getSelectedUsers()
+
+                val newGroup = currentGroup.copy(members = currentGroup.members!!.plus(users.map{it.UUID}).distinct())
+
+                val db = Firebase.firestore
+
+                db.collection("groups").document(currentGroup.id).set(newGroup).addOnSuccessListener { documentReference ->
+                    Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
+                    Toast.makeText(this, "Users has been added", Toast.LENGTH_SHORT).show()
+
+                }.addOnFailureListener { e ->
+                            Log.w(TAG, "Error adding document", e)
+                            Toast.makeText(this, "Users were not added successfully", Toast.LENGTH_SHORT).show()
+                        }
+                supportFragmentManager.beginTransaction().apply{
+                    replace(R.id.topFrame, twoDayViewFragment, "TOP_FRAG")
+                    commit()
+                }
+                showingTwoDayFragment = true
+            }
+
+        }
+
 
         scrollView.setOnTouchListener { _: View, m: MotionEvent ->
             detectedTouch(m)
@@ -180,9 +239,9 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                 if(holdFlag2) // if we were holding this whole time
                 {
                     if(m.x >= day1ImageView.left && m.x <= day1ImageView.right)
-                        Handler(Looper.getMainLooper()).post(Runnable { toastBusyMembersAtTime(clickPostionToTime(m.y, true)) })
+                        Handler(Looper.getMainLooper()).post { toastBusyMembersAtTime(clickPositionToTime(m.y, true)) }
                     else if(m.x >= day2ImageView.left && m.x <= day2ImageView.right)
-                        Handler(Looper.getMainLooper()).post(Runnable { toastBusyMembersAtTime(clickPostionToTime(m.y, false)) })
+                        Handler(Looper.getMainLooper()).post { toastBusyMembersAtTime(clickPositionToTime(m.y, false)) }
                 }
                 holdFlag1 = false
             }
@@ -241,10 +300,8 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         val eventsInInterval = events.filter { event -> toLocalDateTime(event.startDateTime) < clickedTime && toLocalDateTime(event.endDateTime) > clickedTime}
 
         for (e in eventsInInterval) {
-            if ( e.group == null) //and that event is not a group event
-                busyMembers = busyMembers.plus(userIdNamePairs.getValue(e.owner))
-            else if (e.group != currentGroup.id) // else and this is a group event of another group
-                busyMembers = e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }.map{id -> usersInGroup.find{ user -> user.UUID == id }!!.name }
+            if (e.group == null || e.group != currentGroup.id) // else and this is a group event of another group
+                busyMembers = busyMembers.plus(e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }.map{id -> usersInGroup.find{ user -> user.UUID == id }!!.name })
 
         }
 
@@ -280,11 +337,6 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
          .addOnFailureListener { exception ->
              Log.d(TAG, "Error getting documents: ", exception)
          }
-
-
-        // the first string is the key which we are using id, the second string is the values which is the name
-        userIdNamePairs = mapOf("9LGIvmb5ugZuUy8EQa6AQmz5hiB3" to "Alex", "LyYOnCbf3zNwI6QxIfzLwyYzTXE3" to "Viktor Fries")
-
     }
 
 
@@ -329,9 +381,9 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     // this function will fill the columns with all the appropriate regions
     private fun loadColumns()
     {
-        if(!setScaler)
+        if(!setScalar)
         {
-            setScaler = true
+            setScalar = true
             findViewById<LinearLayout>(R.id.groupCalendarTimeLayout).apply { scalar = getChildAt(1).top - getChildAt(0).top }
         }
 
@@ -633,7 +685,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     }
 
     // determines the date time associated with the location on the scrollview that the user clicked on
-    private fun clickPostionToTime(y : Float, isLeftDay : Boolean) : LocalDateTime
+    private fun clickPositionToTime(y : Float, isLeftDay : Boolean) : LocalDateTime
     {
         val time = (y - scalar.toFloat())/scalar.toFloat() + scrollView.scrollY/scalar.toFloat()
         val hour = time - (time % 1) - 1

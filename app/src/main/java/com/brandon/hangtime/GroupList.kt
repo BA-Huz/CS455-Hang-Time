@@ -23,6 +23,7 @@ class GroupList : AppCompatActivity()
 
     private lateinit var groupList : ListView
 
+    //A list of all the groups a user is in
     private var userGroups:List<FirebaseDataObjects.Group> = listOf()
 
 
@@ -50,6 +51,7 @@ class GroupList : AppCompatActivity()
         logOutButton = findViewById(R.id.logOutButton)
     }
 
+    //Sets the groupList on click to take the user to the appropriate group
     private fun setListView()
     {
         groupList = findViewById((R.id.groupList))
@@ -83,6 +85,7 @@ class GroupList : AppCompatActivity()
     }
 
 
+    //Selects all groups from Firestore that the current user is a particpantof
     private fun loadUserGroups(uuid:String){
 
         val groups = Firebase.firestore.collection("groups")
@@ -97,7 +100,7 @@ class GroupList : AppCompatActivity()
                 Log.d(TAG, "Error getting documents: ", exception)
             }
 
-        groups.whereEqualTo("owner",uuid).get().addOnSuccessListener {  result ->
+        /*groups.whereEqualTo("owner",uuid).get().addOnSuccessListener {  result ->
             val userGroups = result!!.map { snapshot ->
                 snapshot.toObject<FirebaseDataObjects.Group>()
             }
@@ -105,11 +108,12 @@ class GroupList : AppCompatActivity()
         }
             .addOnFailureListener { exception ->
                 Log.d(TAG, "Error getting documents: ", exception)
-            }
+            }*/
 
 
     }
 
+    //Updates the adapter with the list of groups to be displayed.
     private fun addGroupsToList(groups:List<FirebaseDataObjects.Group>){
         userGroups = userGroups + groups
         val adapter = ArrayAdapter(

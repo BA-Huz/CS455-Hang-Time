@@ -35,6 +35,7 @@ class GroupCreate : AppCompatActivity() {
         }
 
 
+        //Set the autoComplete to use a list of all users
         private fun setAutoComplete(){
                 val usersDB = Firebase.firestore.collection("users")
 
@@ -84,8 +85,7 @@ class GroupCreate : AppCompatActivity() {
 
         }
 
-
-
+        //Adds the current group information to Firestore
          private fun addGroup(name: String){
                  val db = Firebase.firestore
                  val id = db.collection("groups").document().id

@@ -41,15 +41,6 @@ class SignUp : AppCompatActivity()
             errorTextView.text = message
     }
 
-    override fun onStart()
-    {
-        super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        if(currentUser != null){
-            reload()
-        }
-    }
 
     // end of call back overrides   **********   end of call back overrides   **********   end of call back overrides
 
@@ -91,11 +82,6 @@ class SignUp : AppCompatActivity()
                 passwordEditText.setText("")
                 reenterPasswordEditText.setText("")
             }
-            /*else if (userInfoAlreadyExists()) //No longer needed because of how google auth handles this.
-            {
-                // tells the user that their sign in info already exists
-                errorTextView.text = getString(R.string.infoAlreadyExistsError)
-            }*/
             else
                 submitSignUpInfo()
         }
@@ -115,6 +101,7 @@ class SignUp : AppCompatActivity()
 
     // *****************************************************************************************
 
+    //Submits a request to Firebase to create a new user with the email and password provided.
     private fun submitSignUpInfo()
     {
         auth.createUserWithEmailAndPassword(removeEndingWhiteSpaces(emailEditText.text.toString()), removeEndingWhiteSpaces(passwordEditText.text.toString()))
@@ -138,7 +125,7 @@ class SignUp : AppCompatActivity()
     }
 
 
-
+    //Creates a document in Firestore that contains user details to be used later throughout the application
     private fun updateFirestore(fbUser: FirebaseUser?, name: String){
         val db = Firebase.firestore
         if(fbUser == null) return
@@ -159,12 +146,8 @@ class SignUp : AppCompatActivity()
     }
 
 
-    //Runs if user is already signed in. Should redirect them to MainActivity
-    private fun reload(){
 
-    }
-
-
+    //Updates the activity for the user if they are successfully signed in
     private fun updateUI(user: FirebaseUser?) {
         if(user != null){
             val intent = Intent(this, GroupList::class.java)

@@ -44,10 +44,10 @@ class FragmentPersonalCalendar : Fragment()
         return v
     }
 
+    //Initializes the calendars DateChange function to display the events for that day in the Recycler view.
     private fun setUpCalendar(v : View)
     {
         calendar = v.findViewById(R.id.personalCalendar) as CalendarView
-
         calendar.setOnDateChangeListener { _, year, month, dayOfMonth ->
 
             val selectedDate = LocalDateTime.of(year,month+1,dayOfMonth,0,0)
@@ -65,13 +65,15 @@ class FragmentPersonalCalendar : Fragment()
 
     }
 
+    //Get the events for the current user from today forwards.
+    //Update the RecyclerView to show todays events
     private fun getEvents(){
         val db = Firebase.firestore.collection("events")
 
         val date = FirebaseDataObjects.toTimestamp(
             LocalDate.now().atStartOfDay())
 
-        db.whereEqualTo("owner", Firebase.auth.currentUser!!.uid)
+        db.whereArrayContains("participants", Firebase.auth.currentUser!!.uid)
             .whereGreaterThanOrEqualTo("endDateTime", date)
             .get().addOnSuccessListener {  result ->
                 eventsList = result!!.map { snapshot ->
@@ -102,7 +104,7 @@ class FragmentPersonalCalendar : Fragment()
 
 
 
-
+//RecyclerView Adapter for Events
 class EventAdapter (private val mEvents: List<FirebaseDataObjects.Event>) : RecyclerView.Adapter<EventAdapter.ViewHolder>(){
 
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {

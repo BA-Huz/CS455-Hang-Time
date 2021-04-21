@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
 
-//
+//Object representations of the Firebase Firestore documents
 
 object FirebaseDataObjects {
 

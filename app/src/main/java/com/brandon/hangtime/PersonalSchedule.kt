@@ -23,7 +23,7 @@ import java.time.LocalTime
  */
 
 
-                    // The Personal schedule class will override this function from DatePickerDialog and TimePickerDialog
+// The Personal schedule class will override this function from DatePickerDialog and TimePickerDialog
 class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener
 {
 
@@ -138,6 +138,7 @@ class PersonalSchedule : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         (supportFragmentManager.findFragmentByTag("TOP_FRAG_TAG") as FragmentEventEditor).setEdits(startTimePicker, eventDate)
     }
 
+    //Saves a newly created event to Firestore, ensuring that the current user is added as a participant
     internal fun submitNewEvent(event:FirebaseDataObjects.Event)
     {
         val db = Firebase.firestore

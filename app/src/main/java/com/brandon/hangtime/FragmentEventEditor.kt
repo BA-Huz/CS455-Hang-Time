@@ -38,7 +38,6 @@ class FragmentEventEditor : Fragment()
     {
         val v = inflater.inflate(R.layout.fragment_event_editor, container, false)
 
-
         setLateInits(v)
         setListeners()
 
