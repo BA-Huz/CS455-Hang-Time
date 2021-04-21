@@ -33,7 +33,6 @@ class UserSelectFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         setAdapters()
-        //setAutoCompleteAdapter()
     }
 
     private fun setLateInits(v : View)

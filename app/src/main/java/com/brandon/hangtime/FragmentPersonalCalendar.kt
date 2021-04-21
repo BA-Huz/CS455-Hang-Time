@@ -124,11 +124,10 @@ class EventAdapter (private val mEvents: List<FirebaseDataObjects.Event>) : Recy
         val event: FirebaseDataObjects.Event = mEvents[position]
 
         viewHolder.eventNameTextView.text = event.name
-        viewHolder.eventStartTextView.text = Resources.getSystem().getString(R.string.start,toLocalDateTime(event.startDateTime).format(
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-
-        viewHolder.eventEndTextView.text = Resources.getSystem().getString(R.string.end,toLocalDateTime(event.endDateTime).format(
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+        viewHolder.eventStartTextView.text = "Start: ${toLocalDateTime(event.startDateTime).format(
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))}"
+        viewHolder.eventEndTextView.text = "End: ${toLocalDateTime(event.endDateTime).format(
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))}"
     }
 
     override fun getItemCount(): Int {
