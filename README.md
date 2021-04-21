@@ -23,7 +23,7 @@ Hang Time is created by Brandon Huzil and Viktor Fries
 - [Bug Report](#bug-report)
 
 ## Installation
-Download a copy of the repo and ensure all libraries and dependencies are up to date. To run your own instance of Hang Time, you will need to create a Google Firebase application for it to interface with. There are instructions on how to do that [here](https://firebase.google.com/docs/android/setup).
+Download a copy of the repo and ensure all libraries and dependencies are up to date. Using android studio will allow you to build and install a copy of the app onto an android device. To run your own instance of Hang Time, you will need to create a Google Firebase application for it to interface with. There are instructions on how to do that [here](https://firebase.google.com/docs/android/setup).
 Once your application is linked with Firebase, you will need to create collections in Firestore. Create three collections called "events", "groups", and "users" respectively. You will also need to update the Firestore rules to allow authenticated users to access Firestore. Change the rules to the following to allow all authenticated users read and write access.
 ```javascript
 service cloud.firestore {
