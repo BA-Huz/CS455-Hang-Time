@@ -19,7 +19,7 @@ Hang Time is created by Brandon Huzil and Viktor Fries
   - [Push Notifications](#push-notifications)
   - [Recurring Events](#recurring-events)
   - [Friend Codes](#friend-codes)
-- [Contact Us](## Contact Us)
+- [Contact Us](##-contact-us)
 - [Copyright](#copyright)
 - [Bug Report](#bug-report)
 
