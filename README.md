@@ -1,5 +1,7 @@
 # CS455-Hang-Time
-![image](https://user-images.githubusercontent.com/56166683/115088823-4996c000-9ece-11eb-9dfb-4dc85e170846.png)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/56166683/115088823-4996c000-9ece-11eb-9dfb-4dc85e170846.png" width="300" height="300">
+</p>
 
 Hang Time is a social and personal time managment app that alows friend groups to see and organize social events at the best times for all. Users can add into their personal calendar things like work or times when they are busy. Users can then create groups with their friends that allow them to see the times group members are free and times they are busy in order to schedule events. While it can be used like other traditonal time managment applications to schedule large events well inadvance such as a party or dance, Hang Time hopes to fill a void that is currently missing by giving users the ability to easily schedule less formal events on short notice. By consolidating scheduled events for users, Hang Time hopes to replace messy group chats that are currently used by many to try to schedule these events.
 
