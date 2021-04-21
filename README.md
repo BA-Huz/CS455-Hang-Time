@@ -61,6 +61,8 @@ This data class contains objects used to interact with Google Firestore, as well
 This fragment contains the UI elements to create or edit an event.
 ### UserSelectFragment.kt
 This fragment contains an autocomplete TextView that can be populated with a list of users. It maintains an internal list of selected users that can be retrieved for populating group members or event particpants.
+### Layout
+All layout.xml files are contained here. If new layouts are needed, or changes to existing ones should be made, the files will be in here.
 
 ## Future Changes
 Some features that weren't able to make the initial release of Hang Time are still in demand. 
