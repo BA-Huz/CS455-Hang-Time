@@ -9,17 +9,19 @@ Hang Time is created by Brandon Huzil and Viktor Fries
 
 ## Table of Contents
 - [Installation](#installation)
-
 - [App Usage](#app-usage)
   - [Starting Out](#starting-out)
   - [Your Personal Calendar](#your-personal-calendar)
   - [Groups](#groups)
-
 - [Use Case](#use-case)
-
 - [Manifest](#maniest)
-
 - [Future Changes](#future-changes)
+  - [Editing Events and Groups](#editing-events-and-eroups)
+  - [Push Notifications](#push-notifications)
+  - [Recurring Events](#recurring-events)
+  - [Friend Codes](#friend-codes)
+- [Copyright](#copyright)
+- [Bug Report](#bug-report)
 
 ## Installation
 Download a copy of the repo and ensure all libraries and dependencies are up to date. To run your own instance of Hang Time, you will need to create a Google Firebase application for it to interface with. There are instructions on how to do that [here](https://firebase.google.com/docs/android/setup).
@@ -82,6 +84,14 @@ Automatically notifying your friends of upcoming scheduled events, or letting th
 While Hang Time events are generally spontaneous, we'd like to add the functionality for users to easily set up repeating events. This would allow users to easily mark off times they are always busy, such as with work, or schedule group events for the same time every week, such as RPG meetups.
 ### Friend Codes
 Currently, inviting a friend to one of your groups requires you to know their email address. In the future, we'd like to implement a variety of easier ways to connect with friends such as scanable QR codes, hyper links, and short codes that can easily be used to join grups or add people to them without requiring you to know everything about someone.
+
+## Copyright
+Ask Trevor
+
+## Bug Report
+Currently we have radio buttons that will have no effect. When creating an event you will see 3 radio buttons that say "Non Repetitive", "Daily Event", and "Weekly Event". as of now these widgets are not hooked up to anything. see [Recurring Events](#recurring-events) for details.
+
+See a bug we dont? Feel free to help us squash it by contacting us about it.
 
 
 
