@@ -42,9 +42,13 @@ Your first time using Hangtime will look quite similar to your first use of many
 
 ### Your Personal Calendar
 In your personal calendar you can choose to add an event. Events need a name, and a starting and ending time. Once you have submitted an event youll notice that selecting the day on the calendar in which your event takes place will show it in a list. This list shows all the events in your currently selected day.
+![Screenshot_20210420-200236_Hang Time](https://user-images.githubusercontent.com/56166683/115486829-aa96fe80-a214-11eb-9351-42658c8a411f.jpg)
+
 
 ### Groups
-You can create groups with the emails of other users and then youll see all your groups your a member of in the group list. Clicking on a group brings you to that groups calendar. You'll notice this page is quite different then your personal calendar. You will see two days at a time as coloumns divided by time. You will also see grey regions spanning these days. These regions represent the times when the other group members are busy with personal events or other group events. the darker the grey the greator the percentage of group members are busy at that time. Touching the grey region will toast who is busy at that point in time. You can schedule group events much like you could personal events with a start and end time. These group events will also show on the calendarbut as blue regions.
+You can create groups with the emails of other users and then youll see all your groups your a member of in the group list. Clicking on a group brings you to that groups calendar. You'll notice this page is quite different then your personal calendar. You will see two days at a time as coloumns divided by time. You will also see grey regions spanning these days. These regions represent the times when the other group members are busy with personal events or other group events. the darker the grey the greator the percentage of group members are busy at that time. Touching the grey region will toast who is busy at that point in time. You can schedule group events much like you could personal events with a start and end time. These group events will also show on the calendarbut as blue regions.![Screenshot_20210420-200657_Hang Time](https://user-images.githubusercontent.com/56166683/115486840-aff44900-a214-11eb-8e83-d50282a7d097.jpg)
+
+
 
 ## Manifest
 * FirebaseDataObjects.kt
@@ -86,7 +90,7 @@ Currently, inviting a friend to one of your groups requires you to know their em
 Ask Trevor
 
 ## Bug Report
-Currently we have radio buttons that will have no effect. When creating an event you will see 3 radio buttons that say "Non Repetitive", "Daily Event", and "Weekly Event". as of now these widgets are not hooked up to anything. See [Recurring Events](#recurring-events) for details.
+Currently we have radio buttons that will have no effect. When creating an event you will see 3 radio buttons that say "Non Repetitive", "Daily Event", and "Weekly Event". as of now these widgets are not hooked up to anything. See [Recurring Events](#recurring-events) for details. When adding a new group event, it wont actually display the blue region on that day until you have performed a swipe or have changed pages.
 
 See a bug we dont? Feel free to help us squash it by contacting us about it.
 
