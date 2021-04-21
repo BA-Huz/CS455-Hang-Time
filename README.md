@@ -19,6 +19,7 @@ Hang Time is created by Brandon Huzil and Viktor Fries
   - [Push Notifications](#push-notifications)
   - [Recurring Events](#recurring-events)
   - [Friend Codes](#friend-codes)
+- [Contact Us](## Contact Us)
 - [Copyright](#copyright)
 - [Bug Report](#bug-report)
 
@@ -74,6 +75,11 @@ Automatically notifying your friends of upcoming scheduled events, or letting th
 While Hang Time events are generally spontaneous, we'd like to add the functionality for users to easily set up repeating events. This would allow users to easily mark off times they are always busy, such as with work, or schedule group events for the same time every week, such as RPG meetups.
 ### Friend Codes
 Currently, inviting a friend to one of your groups requires you to know their email address. In the future, we'd like to implement a variety of easier ways to connect with friends such as scanable QR codes, hyper links, and short codes that can easily be used to join grups or add people to them without requiring you to know everything about someone.
+
+## Contact Us
+If you need to get in contact with the main authors for any reason, you can reach us using the information below.
+Brandon Huzil - [Email](mailto:ba.huzil@sasktel.net?subject=[GitHub]%20Hang%20Time)
+Viktor Fries - [Email](mailto:vafries@gmail.com?subject=[GitHub]%20Hang%20Time)
 
 ## Copyright
 This is free and unencumbered software released into the public domain.
