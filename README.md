@@ -7,8 +7,6 @@ Hang Time is a social and personal time managment app that alows friend groups t
 
 Hang Time is created by Brandon Huzil and Viktor Fries
 
-**Put screenshots of the app here**
-
 ## Table of Contents
 - [Installation](#installation)
 - [App Usage](#app-usage)
