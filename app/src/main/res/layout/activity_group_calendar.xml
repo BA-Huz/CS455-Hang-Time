@@ -39,99 +39,99 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="12:00 AM"/>
+                android:text="@string/_12_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="1:00 AM"/>
+                android:text="@string/_1_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="2:00 AM"/>
+                android:text="@string/_2_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="3:00 AM"/>
+                android:text="@string/_3_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="4:00 AM"/>
+                android:text="@string/_4_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="5:00 AM"/>
+                android:text="@string/_5_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="6:00 AM"/>
+                android:text="@string/_6_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="7:00 AM"/>
+                android:text="@string/_7_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="8:00 AM"/>
+                android:text="@string/_8_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="9:00 AM"/>
+                android:text="@string/_9_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="10:00 AM"/>
+                android:text="@string/_10_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="11:00 AM"/>
+                android:text="@string/_11_00_am"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="12:00 PM"/>
+                android:text="@string/_12_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="1:00 PM"/>
+                android:text="@string/_1_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="2:00 PM"/>
+                android:text="@string/_2_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="3:00 PM"/>
+                android:text="@string/_3_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="4:00 PM"/>
+                android:text="@string/_4_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="5:00 PM"/>
+                android:text="@string/_5_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="6:00 PM"/>
+                android:text="@string/_6_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="7:00 PM"/>
+                android:text="@string/_7_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="8:00 PM"/>
+                android:text="@string/_8_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="9:00 PM"/>
+                android:text="@string/_9_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="10:00 PM"/>
+                android:text="@string/_10_00_pm"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="11:00 PM"/>
+                android:text="@string/_11_00_pm"/>
             <!--this view is so the bar at the bottom with menu home and back does not cover the last textview-->
             <View
                 android:layout_width="match_parent"
@@ -172,7 +172,7 @@
             android:layout_height="70dp"
             android:layout_width="0dp"
             android:layout_weight="46"
-            android:text = "Schedule a Group Event"
+            android:text = "@string/schedule_a_group_event"
             android:id="@+id/GroupEventButton" />
         <View
             android:layout_height="70dp"
@@ -182,7 +182,7 @@
             android:layout_height="70dp"
             android:layout_width="0dp"
             android:layout_weight="46"
-            android:text = "Add a new member"
+            android:text = "@string/add_a_new_member"
             android:id="@+id/addGroupMember"/>
     </LinearLayout>
 

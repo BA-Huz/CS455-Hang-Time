@@ -28,9 +28,45 @@
     <string name="add_users">Add Users</string>
     <string name="enter_someones_name_to_add_them_to_the_group">Enter someones name to add them to the group</string>
     <string name="cancel">Cancel</string>
-    <string name="save">Save</string>
     <!-- These strings are used with displaying events -->
     <string name="start">Start: %1$s</string>
     <string name="end">End: %1$s</string>
+    <string name="_12_00_am">12:00 AM</string>
+    <string name="_1_00_am">1:00 AM</string>
+    <string name="_2_00_am">2:00 AM</string>
+    <string name="_3_00_am">3:00 AM</string>
+    <string name="_4_00_am">4:00 AM</string>
+    <string name="_5_00_am">5:00 AM</string>
+    <string name="_6_00_am">6:00 AM</string>
+    <string name="_7_00_am">7:00 AM</string>
+    <string name="_8_00_am">8:00 AM</string>
+    <string name="_9_00_am">9:00 AM</string>
+    <string name="_10_00_am">10:00 AM</string>
+    <string name="_11_00_am">11:00 AM</string>
+    <string name="_12_00_pm">12:00 PM</string>
+    <string name="_1_00_pm">1:00 PM</string>
+    <string name="_2_00_pm">2:00 PM</string>
+    <string name="_3_00_pm">3:00 PM</string>
+    <string name="_4_00_pm">4:00 PM</string>
+    <string name="_5_00_pm">5:00 PM</string>
+    <string name="_6_00_pm">6:00 PM</string>
+    <string name="_7_00_pm">7:00 PM</string>
+    <string name="_8_00_pm">8:00 PM</string>
+    <string name="_9_00_pm">9:00 PM</string>
+    <string name="_10_00_pm">10:00 PM</string>
+    <string name="_11_00_pm">11:00 PM</string>
+    <string name="schedule_a_group_event">Schedule a Group Event</string>
+    <string name="add_a_new_member">Add a new member</string>
+    <string name="PrivateGroup">Private Group</string>
+    <string name="event_name">Event Name</string>
+    <string name="event_start_time">Event Start Time</string>
+    <string name="event_end_time">Event End Time</string>
+    <string name="non_repetitive">Non Repetitive</string>
+    <string name="daily_event">Daily Event</string>
+    <string name="weekly_event">Weekly Event</string>
+    <string name="save">Save</string>
+    <string name="day_1">day 1</string>
+    <string name="day_2">day 2</string>
+    <string name="enter_an_email">Enter an email</string>
 
 </resources>

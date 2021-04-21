@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"
-    xmlns:tools = "http://schemas.android.com/tools"
     android:layout_width = "fill_parent"
     android:layout_height = "wrap_content"
     android:gravity = "top"
@@ -9,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event Name"/>
+        android:text="@string/event_name"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -20,7 +19,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event Start Time"/>
+        android:text="@string/event_start_time"/>
 
 
     <TextView
@@ -33,7 +32,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event End Time"/>
+        android:text="@string/event_end_time"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -64,24 +63,24 @@
             android:id="@+id/personalEventNonRepeatingRadio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Non Repetitive"/>
+            android:text="@string/non_repetitive"/>
         <RadioButton
             android:id="@+id/personalEventDailyRadio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Daily Event"/>
+            android:text="@string/daily_event"/>
         <RadioButton
             android:id="@+id/personalEventWeeklyRadio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Weekly Event"/>
+            android:text="@string/weekly_event"/>
 
     </RadioGroup>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text = "Save"
+        android:text = "@string/save"
         android:id="@+id/savePersonalEventButton"/>
 
 </LinearLayout>
