@@ -102,7 +102,7 @@ For more information, please refer to <http://unlicense.org/>
 ## Bug Report
 Currently we have radio buttons that will have no effect. When creating an event you will see 3 radio buttons that say "Non Repetitive", "Daily Event", and "Weekly Event". as of now these widgets are not hooked up to anything. See [Recurring Events](#recurring-events) for details. When adding a new group event, it wont actually display the blue region on that day until you have performed a swipe or have changed pages.
 
-See a bug we dont? [Email](vafries@gmail.com) us so we can squash it!
+See a bug we dont? [Email](mailto:vafries@gmail.com?subject=[GitHub]%20Hang%20Time) us so we can squash it!
 
 
 
