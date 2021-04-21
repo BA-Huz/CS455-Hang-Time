@@ -42,17 +42,15 @@ Your first time using Hangtime will look quite similar to your first use of many
 
 ### Your Personal Calendar
 In your personal calendar you can choose to add an event. Events need a name, and a starting and ending time. Once you have submitted an event youll notice that selecting the day on the calendar in which your event takes place will show it in a list. This list shows all the events in your currently selected day.
-<p align="right">
+<p align="center">
   <img src="https://user-images.githubusercontent.com/56166683/115486829-aa96fe80-a214-11eb-9351-42658c8a411f.jpg" width="200" height="400">
 </p>
 
-
-
 ### Groups
-<p align="right">
+You can create groups with the emails of other users and then youll see all your groups your a member of in the group list. Clicking on a group brings you to that groups calendar. You'll notice this page is quite different then your personal calendar. You will see two days at a time as coloumns divided by time. You will also see grey regions spanning these days. These regions represent the times when the other group members are busy with personal events or other group events. the darker the grey the greator the percentage of group members are busy at that time. Touching the grey region will toast who is busy at that point in time. You can schedule group events much like you could personal events with a start and end time. These group events will also show on the calendarbut as blue regions.
+<p align="center">
   <img src="https://user-images.githubusercontent.com/56166683/115486840-aff44900-a214-11eb-8e83-d50282a7d097.jpg" width="200" height="400">
 </p>
-You can create groups with the emails of other users and then youll see all your groups your a member of in the group list. Clicking on a group brings you to that groups calendar. You'll notice this page is quite different then your personal calendar. You will see two days at a time as coloumns divided by time. You will also see grey regions spanning these days. These regions represent the times when the other group members are busy with personal events or other group events. the darker the grey the greator the percentage of group members are busy at that time. Touching the grey region will toast who is busy at that point in time. You can schedule group events much like you could personal events with a start and end time. These group events will also show on the calendarbut as blue regions.
 
 ## Manifest
 * FirebaseDataObjects.kt
