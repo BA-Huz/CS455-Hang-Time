@@ -1,5 +1,5 @@
 # CS455-Hang-Time
-<img alt="Kotlin" src="https://img.shields.io/badge/kotlin-%230095D5.svg?&style=for-the-badge&logo=kotlin&logoColor=white"/>
+[<img alt="Kotlin" src="https://img.shields.io/badge/kotlin-%230095D5.svg?&style=for-the-badge&logo=kotlin&logoColor=white"/>https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white]
 <p align="center">
   <img src="https://user-images.githubusercontent.com/56166683/115088823-4996c000-9ece-11eb-9dfb-4dc85e170846.png" width="300" height="300">
 </p>
