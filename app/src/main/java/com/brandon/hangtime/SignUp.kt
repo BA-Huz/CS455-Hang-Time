@@ -70,12 +70,12 @@ class SignUp : AppCompatActivity()
         signUpButton.setOnClickListener {
 
             errorTextView.text = ""
-            if( ! allEditTextsFilled())
+            if( !allEditTextsFilled())
             {
                 // tells the user to enter info in all the fields
                 errorTextView.text = getString(R.string.allFieldsError)
             }
-            else if ( ! passwordsAreEqual())
+            else if ( !passwordsAreEqual())
             {
                 // tells the user their passwords do not match
                 errorTextView.text = getString(R.string.passwordsDontMatchError)
@@ -90,13 +90,16 @@ class SignUp : AppCompatActivity()
     // tests if the passwords are the same
     private fun passwordsAreEqual() : Boolean
     {
-        return (removeEndingWhiteSpaces(passwordEditText.text.toString()) == removeEndingWhiteSpaces(reenterPasswordEditText.text.toString()))
+        return (passwordEditText.text.toString().trimEnd() == reenterPasswordEditText.text.toString().trim())
     }
 
     // tests to see if all of the EditTexts are filled and not empty
     private fun allEditTextsFilled() : Boolean
     {
-        return !((removeEndingWhiteSpaces(nameEditText.text.toString()) == ""|| removeEndingWhiteSpaces(emailEditText.text.toString()) == "") || (removeEndingWhiteSpaces(passwordEditText.text.toString()) == "" || removeEndingWhiteSpaces(reenterPasswordEditText.text.toString()) == ""))
+        return !(nameEditText.text.toString().trim().isEmpty() ||
+                emailEditText.text.toString().trim().isEmpty() ||
+                passwordEditText.text.toString().trim().isEmpty() ||
+                reenterPasswordEditText.text.toString().trim().isEmpty())
     }
 
     // *****************************************************************************************
@@ -104,7 +107,7 @@ class SignUp : AppCompatActivity()
     //Submits a request to Firebase to create a new user with the email and password provided.
     private fun submitSignUpInfo()
     {
-        auth.createUserWithEmailAndPassword(removeEndingWhiteSpaces(emailEditText.text.toString()), removeEndingWhiteSpaces(passwordEditText.text.toString()))
+        auth.createUserWithEmailAndPassword(emailEditText.text.toString().trim(), passwordEditText.text.toString().trim())
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
@@ -130,11 +133,7 @@ class SignUp : AppCompatActivity()
         val db = Firebase.firestore
         if(fbUser == null) return
 
-        val user = hashMapOf(
-                "UUID" to fbUser.uid,
-                "email" to fbUser.email,
-                "name" to removeEndingWhiteSpaces(name)
-        )
+        val user:FirebaseDataObjects.User = FirebaseDataObjects.User(fbUser.uid, fbUser.email, name.trim())
 
         db.collection("users").document().set(user).addOnSuccessListener { documentReference ->
             Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
@@ -155,19 +154,6 @@ class SignUp : AppCompatActivity()
         }
     }
 
-    // using autofill will add a space after the auto fill so this function will stop a user from
-    // intentionally or unintentionally having white spaces at the end of a string
-    private fun removeEndingWhiteSpaces(s : String) : String
-    {
-        var n = s.length - 1
-        var numOfSpaces = 0
-        while((s[n] == ' ' || s[n] == '\n') || s[n] == '\t')
-        {
-            numOfSpaces++
-            n--
-        }
-        return s.dropLast(numOfSpaces)
-    }
 
     companion object {
         private const val TAG = "EmailPassword"
