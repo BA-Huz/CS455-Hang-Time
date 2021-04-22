@@ -133,7 +133,11 @@ class SignUp : AppCompatActivity()
         val db = Firebase.firestore
         if(fbUser == null) return
 
-        val user:FirebaseDataObjects.User = FirebaseDataObjects.User(fbUser.uid, fbUser.email, name.trim())
+        val user = hashMapOf(
+                "UUID" to fbUser.uid,
+                "email" to fbUser.email,
+                "name" to name.trim()
+        )
 
         db.collection("users").document().set(user).addOnSuccessListener { documentReference ->
             Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
