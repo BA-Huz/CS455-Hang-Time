@@ -105,6 +105,8 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         setContentView(R.layout.activity_group_calendar)
 
         currentGroup = intent.getSerializableExtra("group") as FirebaseDataObjects.Group
+        if(currentGroup.members != null)
+            numberInGroup = currentGroup.members!!.size
 
         updateUsersInGroup()
 
