@@ -318,7 +318,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
         for (e in eventsInInterval) {
             if (e.group == null || e.group != currentGroup.id) // else and this is a group event of another group
-                busyMembers.addAll(e.participants!!) //.plus(e.participants)
+                busyMembers.addAll(e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }) //.plus(e.participants)
                 //busyMembers = busyMembers.plus(e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }.map{id -> usersInGroup.find{ user -> user.UUID == id }!!.name })
 
         }
