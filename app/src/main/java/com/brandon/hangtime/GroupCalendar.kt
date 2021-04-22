@@ -343,7 +343,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         eventsColl
                 .whereGreaterThanOrEqualTo("endDateTime", FirebaseDataObjects.toTimestamp(firstDate))
                 //Replace listOf<String><() with a list of the uuid of all memebers within the group.
-                //.whereArrayContainsAny("participants", listOf<String>())
+                .whereArrayContainsAny("participants", currentGroup.members!!)
                 .get().addOnSuccessListener { result ->
                     events = result!!.map { snapshot ->
                         snapshot.toObject<FirebaseDataObjects.Event>()
