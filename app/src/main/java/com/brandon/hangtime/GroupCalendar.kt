@@ -106,6 +106,8 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
         currentGroup = intent.getSerializableExtra("group") as FirebaseDataObjects.Group
 
+        updateUsersInGroup()
+
         setLateInits()
 
         supportFragmentManager.beginTransaction().apply {
@@ -117,6 +119,20 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
 
         // grabs the events from the db
         getEvents(LocalDate.now().atStartOfDay())
+    }
+
+    private fun updateUsersInGroup() {
+        val usersDB = Firebase.firestore.collection("users")
+
+        usersDB.whereIn("UUID", currentGroup.members!!.toList()).get().addOnSuccessListener { result ->
+            val users = result!!.map { snapshot ->
+                snapshot.toObject<FirebaseDataObjects.User>()
+            }
+            usersInGroup = users
+        }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "Error getting documents: ", exception)
+                }
     }
 
 
@@ -188,6 +204,7 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
                 eventEditorFragment.setParent(FragmentEventEditor.Parent.GROUPCALENDAR)
             }
             else {
+                addMemberButton.text = "Add A New Member"
                 eventButton.text = "Schedule a Group Event"
                 addMemberButton.isClickable = true
 
@@ -295,13 +312,14 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
     private fun toastBusyMembersAtTime(clickedTime : LocalDateTime)
     {
         // build an array of the names of members busy
-        var busyMembers = listOf<String>()
+        var busyMembers = mutableListOf<String>()
 
         val eventsInInterval = events.filter { event -> toLocalDateTime(event.startDateTime) < clickedTime && toLocalDateTime(event.endDateTime) > clickedTime}
 
         for (e in eventsInInterval) {
             if (e.group == null || e.group != currentGroup.id) // else and this is a group event of another group
-                busyMembers = busyMembers.plus(e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }.map{id -> usersInGroup.find{ user -> user.UUID == id }!!.name })
+                busyMembers.addAll(e.participants!!) //.plus(e.participants)
+                //busyMembers = busyMembers.plus(e.participants!!.filter { usersInGroup.map { x -> x.UUID  }.contains(it) }.map{id -> usersInGroup.find{ user -> user.UUID == id }!!.name })
 
         }
 
@@ -309,9 +327,9 @@ class GroupCalendar : AppCompatActivity(), DatePickerDialog.OnDateSetListener, T
         var message = ""
         for (m in busyMembers.distinct()) {
             message += if (message == "")
-                m
+                usersInGroup.find { user -> user.UUID == m }?.name
             else
-                ", $m"
+                ", ${usersInGroup.find { user -> user.UUID == m }?.name}"
         }
         if (message != "")
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
