@@ -1,4 +1,5 @@
 # CS455-Hang-Time
+[![made-with-python](	https://img.shields.io/badge/Kotlin-0095D5?&style=for-the-badge&logo=kotlin&logoColor=white)]
 <p align="center">
   <img src="https://user-images.githubusercontent.com/56166683/115088823-4996c000-9ece-11eb-9dfb-4dc85e170846.png" width="300" height="300">
 </p>
